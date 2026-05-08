@@ -1,0 +1,140 @@
+.maze-app {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 14px 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #8b5e34;
+  background: rgba(255, 248, 235, 0.92);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+}
+
+.maze-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.maze-header h1 {
+  margin: 0;
+}
+
+.maze-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.timer-board-wrap {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.timer-board-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.timer-board-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.timer-board {
+  min-width: 210px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 2px solid #0f172a;
+  background: #000000;
+  color: #ef4444;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.55);
+}
+
+.maze-workspace {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.maze-panel {
+  min-width: 220px;
+  background: #fffdf5;
+  border: 1px solid #d6c49f;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.maze-panel h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.maze-panel p {
+  margin: 0 0 6px;
+  font-size: 0.92rem;
+}
+
+.maze-state {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.maze-message {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #7c2d12;
+}
+
+.maze-canvas-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+}
+
+#mazeCanvas {
+  border: 3px solid #7a4e2a;
+  background: #fff;
+  display: block;
+}
+
+#mazeStartOverlay .dialog {
+  width: min(90vw, 980px);
+  text-align: center;
+}
+
+#mazeStartControlBtn {
+  display: block;
+  width: min(86vw, 920px);
+  height: min(72vh, 760px);
+  margin: 10px auto 0;
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 800;
+  border-radius: 18px;
+  border: 3px solid #7a4e2a;
+  background: #fef3c7;
+  color: #111827;
+}
+
+#mazeStartControlBtn:hover {
+  background: #fde68a;
+}
+
+.difficulty-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}

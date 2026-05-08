@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dual Knob Maze Escape</title>
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+  </head>
+  <body>
+    <main class="maze-app">
+      <header class="maze-header">
+        <h1>Maze Escape</h1>
+        <div class="timer-board-wrap">
+          <div class="timer-board-group">
+            <span class="timer-board-label">제한시간</span>
+            <div id="mazeLimitBoard" class="timer-board">00:00.0</div>
+          </div>
+          <div class="timer-board-group">
+            <span class="timer-board-label">내기록</span>
+            <div id="mazeRecordBoard" class="timer-board">00:00.0</div>
+          </div>
+        </div>
+        <div class="maze-actions">
+          <a class="size-btn" href="./index.html">홈으로</a>
+          <button id="mazeStartBtn" class="size-btn" type="button">시작</button>
+          <button id="mazeResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <h2>노브 매핑</h2>
+          <p><strong>시작</strong>: 난이도 선택 후 플레이 시작</p>
+          <p><strong>우클릭(노브 버튼)</strong>: 부스트 ON/OFF</p>
+          <p><strong>좌+우 동시(중클릭)</strong>: 현재 비활성화</p>
+          <p><strong>노브 커서이동</strong>: 공 이동</p>
+          <div class="maze-state">
+            <span id="mazeDifficultyState" class="status">Difficulty: -</span>
+            <span id="mazeStageState" class="status">Stage: 0</span>
+            <span id="mazeTimerState" class="status">Time: 00.0</span>
+            <span id="mazeScoreState" class="status">Score: 0</span>
+            <span id="mazeBestRecordState" class="status">Best: -</span>
+            <span id="leftToggleState" class="status">Left: OFF</span>
+            <span id="rightToggleState" class="status">Right: OFF</span>
+            <span id="mazeLevelState" class="status">Level: 15x15</span>
+          </div>
+          <p id="mazeMessage" class="maze-message">도착점(초록)에 도달하세요.</p>
+        </aside>
+
+        <div class="maze-canvas-wrap">
+          <canvas id="mazeCanvas" width="720" height="720"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <div id="mazeStartOverlay" class="overlay">
+      <div class="dialog">
+        <h2>Arcade Maze Start</h2>
+        <p>난이도를 고르고 시작을 누르면 스테이지가 시작됩니다.</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="mazeStartControlBtn" class="size-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="mazeResultOverlay" class="overlay hidden">
+      <div class="dialog">
+        <h2 id="mazeResultTitle">GAME OVER</h2>
+        <p id="mazeResultText">점수를 확인하고 다시 도전하세요.</p>
+        <button id="mazeNextBtn" class="size-btn hidden" type="button">다음 스테이지</button>
+        <button id="mazeReplayBtn" class="size-btn" type="button">다시 도전</button>
+      </div>
+    </div>
+
+    <script src="../scripts/maze.js"></script>
+  </body>
+</html>
