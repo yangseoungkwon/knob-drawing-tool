@@ -310,6 +310,16 @@ body {
     0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+.swatch.palette-cursor {
+  transform: scale(1.22);
+  border-color: #818cf8;
+  box-shadow:
+    0 0 0 3px rgba(129, 140, 248, 0.35),
+    0 0 14px rgba(129, 140, 248, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
 /* ── Overlay (size picker backdrop) ─────────────────────── */
 .overlay {
   position: fixed;
