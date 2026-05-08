@@ -14,7 +14,7 @@ static const uint8_t NEOPIXEL_PIN = 29;
 static const uint8_t NEOPIXEL_COUNT = 1;
 
 // ===== Motion tuning =====
-static const int8_t STEP_PIXELS = 24;     // pixels per encoder detent (target: 20~30)
+static const int8_t STEP_PIXELS = 2;      // pixels per encoder detent — games control sensitivity
 static const int8_t MAX_DELTA_PER_SEND = 8;
 static const uint16_t SEND_INTERVAL_MS = 2;
 static const bool INVERT_X = false;

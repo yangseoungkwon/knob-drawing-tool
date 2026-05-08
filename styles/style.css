@@ -198,6 +198,14 @@ body {
   background-size: 24px 24px;
 }
 
+/* 그리기 캔버스 + 커서 오버레이 컨테이너 */
+.canvas-container {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  cursor: none; /* 가상 셀 커서로 대체 */
+}
+
 #drawCanvas {
   width: auto;
   height: auto;
@@ -205,13 +213,24 @@ body {
   border: none;
   border-radius: 2px;
   background: #ffffff;
-  cursor: crosshair;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.08),
     0 4px 12px rgba(0, 0, 0, 0.1),
     0 20px 48px rgba(0, 0, 0, 0.14);
+}
+
+/* 가상 커서 오버레이 — 클릭은 drawCanvas로 통과 */
+#cursorCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* ── Palette popup (near cursor) ─────────────────────────── */
@@ -368,6 +387,12 @@ body {
   background: #475569;
   border-color: #818cf8;
   color: #e2e8f0;
+}
+
+.home-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* ── Home page cards (preserved) ────────────────────────── */

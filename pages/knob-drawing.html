@@ -19,8 +19,14 @@
             <span id="toolStatus" class="status hidden-ui">Tool: Move</span>
             <span id="colorStatus" class="status hidden-ui">Color: #111111</span>
             <span id="sizeStatus" class="status hidden-ui">Canvas: -</span>
+          </div>
+          <div class="status-wrap">
+            <button id="sensDecBtn" class="size-btn" type="button">−</button>
+            <span id="sensitivityStatus" class="status">2px/칸</span>
+            <button id="sensIncBtn" class="size-btn" type="button">+</button>
             <button id="resizeBtn" class="size-btn" type="button">크기 변경</button>
             <button id="clearBtn" class="size-btn" type="button">초기화</button>
+            <a href="../pages/index.html" class="size-btn home-btn">← 홈</a>
           </div>
         </div>
       </header>
@@ -37,7 +43,10 @@
         </aside>
 
         <div id="canvasWrap" class="canvas-wrap">
-          <canvas id="drawCanvas" width="960" height="640"></canvas>
+          <div class="canvas-container">
+            <canvas id="drawCanvas" width="960" height="640"></canvas>
+            <canvas id="cursorCanvas" width="960" height="640"></canvas>
+          </div>
         </div>
       </div>
     </main>

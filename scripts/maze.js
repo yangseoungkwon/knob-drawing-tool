@@ -22,6 +22,9 @@ const mazeResultTitle = document.getElementById("mazeResultTitle");
 const mazeResultText = document.getElementById("mazeResultText");
 const mazeNextBtn = document.getElementById("mazeNextBtn");
 const mazeReplayBtn = document.getElementById("mazeReplayBtn");
+const mazeSensDecBtn = document.getElementById("mazeSensDecBtn");
+const mazeSensIncBtn = document.getElementById("mazeSensIncBtn");
+const mazeSensStateEl = document.getElementById("mazeSensState");
 
 const LEVEL_PRESETS = {
   easy: [15, 15, 21, 21, 21, 31, 31, 31, 31, 31],
@@ -70,7 +73,8 @@ const mouseMoveState = {
   accY: 0
 };
 
-const MOUSE_MOVE_THRESHOLD = 18;
+// 감도: 이 px 만큼 누산되면 한 칸 이동 (노브 2px 기준 → 기본 1클릭/칸)
+let MOUSE_MOVE_THRESHOLD = 2;
 const RANKING_STORAGE_KEY = "dual-knob-maze-best-records-v1";
 
 function createEmptyGrid(size) {
@@ -465,5 +469,20 @@ mazeResetBtn.addEventListener("click", () => {
   setupStage(currentSize);
 });
 
+function updateSensStatus() {
+  mazeSensStateEl.textContent = `${MOUSE_MOVE_THRESHOLD}px/칸`;
+}
+
+mazeSensDecBtn.addEventListener("click", () => {
+  MOUSE_MOVE_THRESHOLD = Math.max(1, MOUSE_MOVE_THRESHOLD - 1);
+  updateSensStatus();
+});
+
+mazeSensIncBtn.addEventListener("click", () => {
+  MOUSE_MOVE_THRESHOLD = Math.min(30, MOUSE_MOVE_THRESHOLD + 1);
+  updateSensStatus();
+});
+
 difficultyButtons[0].classList.add("active");
+updateSensStatus();
 openStartOverlay();
