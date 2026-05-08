@@ -15,12 +15,14 @@ static const uint8_t NEOPIXEL_COUNT = 1;
 
 // ===== Motion tuning =====
 static const int8_t STEP_PIXELS = 2;      // pixels per encoder detent — games control sensitivity
-static const int8_t MAX_DELTA_PER_SEND = 24;
-static const uint16_t SEND_INTERVAL_MS = 2;
-static const uint16_t FAST_TURN_MS = 22;
-static const uint16_t MEDIUM_TURN_MS = 40;
-static const int8_t FAST_MULTIPLIER = 4;
-static const int8_t MEDIUM_MULTIPLIER = 2;
+static const int8_t MAX_DELTA_PER_SEND = 48;
+static const uint16_t SEND_INTERVAL_MS = 1;
+static const uint16_t TURBO_TURN_MS = 12;
+static const uint16_t FAST_TURN_MS = 24;
+static const uint16_t MEDIUM_TURN_MS = 45;
+static const int8_t TURBO_MULTIPLIER = 9;
+static const int8_t FAST_MULTIPLIER = 6;
+static const int8_t MEDIUM_MULTIPLIER = 3;
 static const bool INVERT_X = false;
 static const bool INVERT_Y = true;
 
@@ -126,7 +128,9 @@ void updateEncoder(EncoderState &enc, int16_t &axisPending, bool invertAxis) {
     enc.lastDetentMs = now;
 
     int8_t stepScale = 1;
-    if (dt <= FAST_TURN_MS) {
+    if (dt <= TURBO_TURN_MS) {
+      stepScale = TURBO_MULTIPLIER;
+    } else if (dt <= FAST_TURN_MS) {
       stepScale = FAST_MULTIPLIER;
     } else if (dt <= MEDIUM_TURN_MS) {
       stepScale = MEDIUM_MULTIPLIER;
@@ -142,7 +146,9 @@ void updateEncoder(EncoderState &enc, int16_t &axisPending, bool invertAxis) {
     enc.lastDetentMs = now;
 
     int8_t stepScale = 1;
-    if (dt <= FAST_TURN_MS) {
+    if (dt <= TURBO_TURN_MS) {
+      stepScale = TURBO_MULTIPLIER;
+    } else if (dt <= FAST_TURN_MS) {
       stepScale = FAST_MULTIPLIER;
     } else if (dt <= MEDIUM_TURN_MS) {
       stepScale = MEDIUM_MULTIPLIER;
