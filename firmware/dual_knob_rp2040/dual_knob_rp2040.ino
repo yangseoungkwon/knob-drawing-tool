@@ -10,8 +10,9 @@ static const uint8_t RIGHT_ENC_A_PIN = 6;
 static const uint8_t RIGHT_ENC_B_PIN = 7;
 static const uint8_t RIGHT_SW_PIN = 8;
 
-static const uint8_t NEOPIXEL_PIN = 29;
+static const uint8_t NEOPIXEL_PIN = 16;   // Waveshare RP2040-Zero onboard NeoPixel
 static const uint8_t NEOPIXEL_COUNT = 1;
+static const bool RUN_STARTUP_LED_TEST = true;
 
 // ===== Motion tuning =====
 static const int8_t STEP_PIXELS = 2;      // pixels per encoder detent — games control sensitivity
@@ -79,6 +80,19 @@ static inline uint8_t readAB(uint8_t pinA, uint8_t pinB) {
 void setLedColor(uint8_t r, uint8_t g, uint8_t b) {
   pixels.setPixelColor(0, pixels.Color(r, g, b));
   pixels.show();
+}
+
+void runStartupLedTest() {
+  setLedColor(50, 0, 0);   // red
+  delay(220);
+  setLedColor(0, 50, 0);   // green
+  delay(220);
+  setLedColor(0, 0, 50);   // blue
+  delay(220);
+  setLedColor(45, 45, 45); // white
+  delay(220);
+  setLedColor(0, 0, 0);
+  delay(120);
 }
 
 void setLedMode(LedMode mode, uint16_t durationMs = 0) {
@@ -256,9 +270,12 @@ void setup() {
   setupPins();
 
   pixels.begin();
-  pixels.setBrightness(30);
+  pixels.setBrightness(80);
   pixels.clear();
   pixels.show();
+  if (RUN_STARTUP_LED_TEST) {
+    runStartupLedTest();
+  }
 
   Mouse.begin();
   setLedMode(LED_IDLE);

@@ -291,20 +291,14 @@ function renderPalette() {
 }
 
 // ── 캔버스 크기별 기본 감도 ───────────────────────────────
-// 펌웨어 STEP_PIXELS=2 기준 속도별 px/detent:
-//   slow(>45ms)=2  medium(24-45ms)=6  fast(12-24ms)=12  turbo(<12ms)=18
-//
-// threshold=6 → medium에서 딱 1칸 (작은 캔버스 정밀 제어)
-//   slow: 3클릭/칸 | medium: 1클릭/칸 | fast: 2칸/클릭 | turbo: 3칸/클릭
-//
-// threshold=2 → slow에서 딱 1칸 (큰 캔버스, 가속으로 빠른 이동)
-//   slow: 1클릭/칸 | medium: 3칸/클릭 | fast: 6칸/클릭 | turbo: 9칸/클릭
+// threshold = STEP_PIXELS(2) → 1클릭(detent) = 1칸 (모든 캔버스 공통)
+// 가속은 펌웨어가 담당: medium=6px(3칸), fast=12px(6칸), turbo=18px(9칸)
 const CANVAS_THRESHOLD = {
-  10:  6,  // 작은 캔버스: medium 1클릭=1칸, turbo 최대 3칸/클릭
-  15:  6,  // 작은 캔버스: medium 1클릭=1칸, turbo 최대 3칸/클릭
-  30:  2,  // 중간 캔버스: slow 1클릭=1칸, turbo 9칸/클릭(30칸 ~4클릭 횡단)
-  50:  2,  // 중간 캔버스: slow 1클릭=1칸, turbo 9칸/클릭(50칸 ~6클릭 횡단)
-  100: 2,  // 큰 캔버스:  slow 1클릭=1칸, turbo 9칸/클릭(100칸 ~12클릭 횡단)
+  10:  2,
+  15:  2,
+  30:  2,
+  50:  2,
+  100: 2,
 };
 
 // ── 캔버스 크기 적용 ──────────────────────────────────────
