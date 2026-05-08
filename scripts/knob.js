@@ -47,7 +47,7 @@ function drawGrid() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const gridStep = state.cellSize;
-  ctx.strokeStyle = "#cbd5e1";
+  ctx.strokeStyle = "#e2e8f0";
   ctx.lineWidth = 1;
   for (let y = 0; y < canvas.height; y += gridStep) {
     for (let x = 0; x < canvas.width; x += gridStep) {
@@ -61,7 +61,7 @@ function updateStatus() {
   toolStatusEl.textContent = `Tool: ${getActiveToolLabel()}`;
   colorStatusEl.textContent = `Color: ${colors[state.colorIndex]}`;
   sizeStatusEl.textContent = `Canvas: ${state.canvasSize ? `${state.canvasSize}x${state.canvasSize}` : "-"}`;
-  resizeBtnEl.textContent = state.canvasSize ? `크기 ${state.canvasSize}x${state.canvasSize}` : "크기 변경";
+  resizeBtnEl.textContent = state.canvasSize ? `${state.canvasSize}×${state.canvasSize}` : "크기 변경";
   modeIconEl.classList.remove("mode-pen", "mode-erase", "mode-move");
   modeIconEl.classList.add(
     state.mode === "paint" ? "mode-pen" : state.mode === "erase" ? "mode-erase" : "mode-move"
@@ -101,7 +101,7 @@ function paintCell(point, button) {
   const cellPaintSize = Math.max(state.cellSize - 1, 1);
   ctx.fillStyle = fillColor;
   ctx.fillRect(cellX + 1, cellY + 1, cellPaintSize, cellPaintSize);
-  ctx.strokeStyle = "#cbd5e1";
+  ctx.strokeStyle = "#e2e8f0";
   ctx.lineWidth = 1;
   ctx.strokeRect(cellX + 0.5, cellY + 0.5, state.cellSize, state.cellSize);
 }
@@ -117,9 +117,7 @@ function canvasPointFromMouse(event) {
 }
 
 canvas.addEventListener("mousemove", (event) => {
-  if (!state.canvasSize) {
-    return;
-  }
+  if (!state.canvasSize) return;
   const point = canvasPointFromMouse(event);
   state.pointer = point;
   state.pointerClient = { x: event.clientX, y: event.clientY };
@@ -128,7 +126,6 @@ canvas.addEventListener("mousemove", (event) => {
     paintCell(point, 0);
     return;
   }
-
   if (state.mode === "erase") {
     paintCell(point, 2);
   }
@@ -137,9 +134,7 @@ canvas.addEventListener("mousemove", (event) => {
 canvas.addEventListener("mouseleave", () => {});
 
 canvas.addEventListener("mousedown", (event) => {
-  if (!state.canvasSize) {
-    return;
-  }
+  if (!state.canvasSize) return;
   if (event.buttons === 3 || event.button === 1) {
     event.preventDefault();
     togglePaletteAt(event.clientX, event.clientY);
@@ -166,26 +161,47 @@ window.addEventListener("keydown", (event) => {
   if (event.key.toLowerCase() === "p") {
     togglePaletteAt(state.pointerClient.x, state.pointerClient.y);
   }
-
   updateStatus();
 });
 
+// 팔레트를 커서 근처에 띄워 이동 최소화
 function togglePaletteAt(clientX, clientY) {
-  const willOpen = palettePanelEl.classList.contains("hidden");
-  if (!willOpen) {
+  const isOpen = !palettePanelEl.classList.contains("hidden");
+  if (isOpen) {
     palettePanelEl.classList.add("hidden");
+    palettePanelEl.classList.remove("palette-anim");
     return;
   }
+
+  // visibility: hidden으로 렌더링해 실제 크기 측정 후 위치 계산
+  palettePanelEl.style.visibility = "hidden";
+  palettePanelEl.style.left = "0px";
+  palettePanelEl.style.top = "0px";
   palettePanelEl.classList.remove("hidden");
-  const popupWidth = 240;
-  const popupHeight = 86;
-  const wrapRect = canvasWrapEl.getBoundingClientRect();
-  const preferredX = wrapRect.left - popupWidth - 16;
-  const preferredY = wrapRect.top + 8;
-  const clampedX = Math.min(Math.max(preferredX, 12), window.innerWidth - popupWidth);
-  const clampedY = Math.min(Math.max(preferredY, 12), window.innerHeight - popupHeight);
-  palettePanelEl.style.left = `${clampedX}px`;
-  palettePanelEl.style.top = `${clampedY}px`;
+  palettePanelEl.classList.remove("palette-anim");
+
+  const pw = palettePanelEl.offsetWidth;
+  const ph = palettePanelEl.offsetHeight;
+  const offset = 14;
+  const margin = 8;
+
+  // 커서 우하단 기본, 화면 끝에 걸리면 반대 방향으로
+  let x = clientX + offset;
+  let y = clientY + offset;
+
+  if (x + pw > window.innerWidth - margin) x = clientX - pw - offset;
+  if (y + ph > window.innerHeight - margin) y = clientY - ph - offset;
+
+  x = Math.max(margin, Math.min(x, window.innerWidth - pw - margin));
+  y = Math.max(margin, Math.min(y, window.innerHeight - ph - margin));
+
+  palettePanelEl.style.left = `${x}px`;
+  palettePanelEl.style.top = `${y}px`;
+  palettePanelEl.style.visibility = "";
+
+  // 애니메이션 재실행 (reflow 강제)
+  void palettePanelEl.offsetWidth;
+  palettePanelEl.classList.add("palette-anim");
 }
 
 function renderMiniPalette() {
@@ -206,10 +222,8 @@ function renderPalette() {
   colors.forEach((color, index) => {
     const swatchBtn = document.createElement("button");
     swatchBtn.className = "swatch";
-    if (index === state.colorIndex) {
-      swatchBtn.classList.add("active");
-    }
-    swatchBtn.title = `color-${index + 1}`;
+    if (index === state.colorIndex) swatchBtn.classList.add("active");
+    swatchBtn.title = color;
     swatchBtn.style.background = color;
     swatchBtn.addEventListener("mousedown", (event) => {
       event.preventDefault();
@@ -265,9 +279,7 @@ resizeBtnEl.addEventListener("click", () => {
 });
 
 clearBtnEl.addEventListener("click", () => {
-  if (!state.canvasSize) {
-    return;
-  }
+  if (!state.canvasSize) return;
   drawGrid();
 });
 

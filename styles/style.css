@@ -1,10 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+/* ── Body (home page background preserved) ───────────────── */
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.08)),
     repeating-linear-gradient(
@@ -17,20 +21,16 @@ body {
   color: #1f2937;
 }
 
+/* ── Drawing page shell ──────────────────────────────────── */
 .app {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  max-width: 1080px;
-  margin: 20px auto;
-  padding: 14px 16px 20px;
-  background: rgba(255, 248, 235, 0.92);
-  border: 1px solid #8b5e34;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+  height: 100vh;
+  overflow: hidden;
+  background: #0f172a;
 }
 
+/* ── Toolbar ─────────────────────────────────────────────── */
 .toolbar {
   display: flex;
   align-items: center;
@@ -38,227 +38,339 @@ body {
   gap: 12px;
   flex-wrap: wrap;
   width: 100%;
-  padding: 0;
+  padding: 10px 20px;
+  background: #1e293b;
+  border-bottom: 1px solid #0f172a;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .toolbar h1 {
-  font-size: 1.25rem;
-  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #475569;
+  text-transform: uppercase;
 }
 
 .control-deck {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .status-wrap {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .status {
-  font-size: 0.9rem;
-  padding: 6px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: #334155;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 .hidden-ui {
   display: none !important;
 }
 
+/* ── Workspace ───────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Artist panel (left sidebar) ─────────────────────────── */
 .artist-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 20px;
-  background: #fffdf5;
-  border: 1px solid #d6c49f;
-  border-radius: 12px;
-  padding: 18px 14px;
-  min-width: 180px;
+  background: #1e293b;
+  border-right: 1px solid #0f172a;
+  padding: 20px 14px;
+  width: 160px;
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
+/* ── Mode icon ───────────────────────────────────────────── */
 .mode-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 10px;
-  border: 2px solid #7c2d12;
-  background: #dcdcdc;
-  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1.5px solid #334155;
+  background-color: #0f172a;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 70%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .mode-pen {
   background-image: url("../assets/pen.png");
   background-size: 78%;
+  border-color: #818cf8;
+  box-shadow: 0 0 16px rgba(129, 140, 248, 0.3);
 }
 
 .mode-erase {
   background-image: url("../assets/eraser.png");
   background-size: 80%;
-}
-
-.mode-move::before {
-  content: none;
+  border-color: #f87171;
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.3);
 }
 
 .mode-move {
   background-image: url("../assets/move.png");
   background-size: 78%;
+  border-color: #475569;
 }
 
+/* ── Mini palette (color ring) ───────────────────────────── */
 .mini-palette {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 130px;
+  height: 130px;
 }
 
 .mini-swatch {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-56px);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-48px);
+  transition: transform 0.15s ease;
 }
 
 .paint-blob {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50% 45% 55% 50%;
-  border: 2px solid #374151;
+  border: 2px solid rgba(255, 255, 255, 0.12);
   background: #111111;
-  box-shadow: inset 0 -6px 10px rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0 -4px 8px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.5);
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  transition: background 0.2s ease;
 }
 
+/* ── Guide card ──────────────────────────────────────────── */
 .guide-card {
   width: 100%;
-  margin-top: 8px;
-  border-radius: 12px;
-  border: 1px solid #d6c49f;
-  display: block;
-}
-
-.palette {
-  display: flex;
-  gap: 12px;
-  padding: 20px;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  margin-top: auto;
   border-radius: 10px;
-  flex-wrap: wrap;
+  border: 1px solid #334155;
+  display: block;
+  opacity: 0.65;
 }
 
-.palette-popup {
-  position: fixed;
-  left: 12px;
-  top: 12px;
-  z-index: 20;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
-}
-
-.hidden {
-  display: none !important;
-}
-
-.swatch {
-  width: 56px;
-  height: 56px;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  cursor: pointer;
-}
-
-.swatch.active {
-  border-color: #111827;
-}
-
-.workspace {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  width: 100%;
-}
-
+/* ── Canvas wrap ─────────────────────────────────────────── */
 .canvas-wrap {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   width: 100%;
   overflow: auto;
+  padding: 32px;
+  background: #f1f5f9;
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 #drawCanvas {
   width: auto;
   height: auto;
   display: block;
-  border: 3px solid #7a4e2a;
-  border-radius: 0;
+  border: none;
+  border-radius: 2px;
   background: #ffffff;
   cursor: crosshair;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 20px 48px rgba(0, 0, 0, 0.14);
 }
 
+/* ── Palette popup (near cursor) ─────────────────────────── */
+.palette {
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  gap: 8px;
+  padding: 14px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+}
+
+/* "COLORS" label as first grid item spanning all columns */
+.palette::before {
+  content: "COLORS";
+  grid-column: 1 / -1;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #475569;
+  text-align: center;
+  padding-bottom: 6px;
+  font-family: "Inter", sans-serif;
+}
+
+.palette-popup {
+  position: fixed;
+  z-index: 50;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.55),
+    0 32px 64px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes paletteIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.palette-popup.palette-anim {
+  animation: paletteIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ── Swatches ────────────────────────────────────────────── */
+.swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  outline: none;
+}
+
+.swatch:hover {
+  transform: scale(1.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+  z-index: 1;
+}
+
+.swatch.active {
+  border-color: #ffffff;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Overlay (size picker backdrop) ─────────────────────── */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.45);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 100;
 }
 
+/* ── Size picker dialog ──────────────────────────────────── */
 .dialog {
   background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  padding: 18px;
-  min-width: 320px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  padding: 28px;
+  min-width: 360px;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.3);
 }
 
 .dialog h2 {
-  margin: 0 0 8px;
   font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
 }
 
 .dialog p {
-  margin: 0 0 14px;
-  color: #4b5563;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 20px;
+  line-height: 1.5;
 }
 
 .size-options {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
+/* ── Buttons ─────────────────────────────────────────────── */
 .size-btn {
-  border: 1px solid #9ca3af;
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 8px 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 10px 14px;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  font-family: "Inter", sans-serif;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .size-btn:hover {
   background: #eef2ff;
+  border-color: #818cf8;
+  color: #4f46e5;
 }
 
+/* Toolbar buttons override */
+.control-deck .size-btn {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  border-radius: 8px;
+}
+
+.control-deck .size-btn:hover {
+  background: #475569;
+  border-color: #818cf8;
+  color: #e2e8f0;
+}
+
+/* ── Home page cards (preserved) ────────────────────────── */
 .home-board {
   max-width: 920px;
   margin: 40px auto;

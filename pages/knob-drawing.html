@@ -4,20 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dual Knob Drawing Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../styles/style.css" />
   </head>
   <body>
     <main class="app">
       <header class="toolbar">
-        <h1>Dual Knob Drawing Tool</h1>
+        <h1>Dual Knob Drawing</h1>
         <div class="control-deck">
           <div class="status-wrap">
-            <span id="penStatus" class="status hidden-ui">Pen: ON</span>
-            <span id="toolStatus" class="status hidden-ui">Tool: Draw</span>
+            <span id="penStatus" class="status hidden-ui">Mode: MOVE</span>
+            <span id="toolStatus" class="status hidden-ui">Tool: Move</span>
             <span id="colorStatus" class="status hidden-ui">Color: #111111</span>
             <span id="sizeStatus" class="status hidden-ui">Canvas: -</span>
             <button id="resizeBtn" class="size-btn" type="button">크기 변경</button>
-            <button id="clearBtn" class="size-btn" type="button">지우기</button>
+            <button id="clearBtn" class="size-btn" type="button">초기화</button>
           </div>
         </div>
       </header>
@@ -41,14 +44,14 @@
 
     <div id="sizePicker" class="overlay">
       <div class="dialog">
-        <h2>그림판 크기 선택</h2>
-        <p>모눈종이 크기를 선택하면 바로 시작됩니다.</p>
+        <h2>캔버스 크기 선택</h2>
+        <p>그리드 크기를 선택하면 바로 시작됩니다.</p>
         <div class="size-options">
-          <button class="size-btn" data-size="10">10 x 10</button>
-          <button class="size-btn" data-size="15">15 x 15</button>
-          <button class="size-btn" data-size="30">30 x 30</button>
-          <button class="size-btn" data-size="50">50 x 50</button>
-          <button class="size-btn" data-size="100">100 x 100</button>
+          <button class="size-btn" data-size="10">10 × 10</button>
+          <button class="size-btn" data-size="15">15 × 15</button>
+          <button class="size-btn" data-size="30">30 × 30</button>
+          <button class="size-btn" data-size="50">50 × 50</button>
+          <button class="size-btn" data-size="100">100 × 100</button>
         </div>
       </div>
     </div>
