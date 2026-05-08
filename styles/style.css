@@ -405,48 +405,94 @@ body {
   align-items: center;
 }
 
-/* ── Home page cards (preserved) ────────────────────────── */
-.home-board {
-  max-width: 920px;
-  margin: 40px auto;
-  padding: 24px;
-  border-radius: 14px;
-  border: 1px solid #8b5e34;
-  background: rgba(255, 248, 235, 0.94);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
-  text-align: center;
+/* ── Home page ───────────────────────────────────────────── */
+.home-body {
+  background: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.home-board h1 {
+.home-shell {
+  width: min(92vw, 640px);
+  padding: 48px 0 56px;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.home-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin-bottom: 14px;
+}
+
+.home-title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 700;
+  color: #f1f5f9;
   margin: 0 0 8px;
+  letter-spacing: -0.02em;
 }
 
 .home-subtitle {
-  margin: 0 0 18px;
-  color: #6b4a2d;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
 }
 
-.home-cards {
+.home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
 .home-card {
   text-decoration: none;
   color: inherit;
-  background: #fffdf5;
-  border: 1px solid #d6c49f;
-  border-radius: 12px;
-  padding: 16px;
-  text-align: left;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.home-card:hover {
+  background: #263448;
+  border-color: #818cf8;
+  transform: translateY(-2px);
+}
+
+.home-card-num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #475569;
 }
 
 .home-card h2 {
-  margin: 0 0 6px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e2e8f0;
 }
 
 .home-card p {
   margin: 0;
-  color: #5b4330;
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.5;
 }

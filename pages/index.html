@@ -4,20 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dual Knob Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../styles/style.css" />
   </head>
-  <body>
-    <main class="home-board">
-      <h1>Dual Knob Playground</h1>
-      <p class="home-subtitle">원하는 모드를 선택해 시작하세요.</p>
-      <div class="home-cards">
+  <body class="home-body">
+    <main class="home-shell">
+      <header class="home-header">
+        <span class="home-badge">DUAL KNOB</span>
+        <h1 class="home-title">Playground</h1>
+        <p class="home-subtitle">원하는 모드를 선택하세요.</p>
+      </header>
+      <div class="home-grid">
         <a class="home-card" href="./knob-drawing.html">
+          <span class="home-card-num">01</span>
           <h2>노브 드로잉</h2>
           <p>모눈 캔버스 색칠, 팔레트 선택, 펜/지우개 토글</p>
         </a>
         <a class="home-card" href="./maze.html">
+          <span class="home-card-num">02</span>
           <h2>미로 탈출게임</h2>
-          <p>노브 매핑 토글 입력으로 미로를 탈출</p>
+          <p>노브 입력으로 미로를 탈출</p>
+        </a>
+        <a class="home-card" href="./safe-crack.html">
+          <span class="home-card-num">03</span>
+          <h2>금고 따기</h2>
+          <p>듀얼 노브 다이얼로 핀을 풀어 금고 해제</p>
+        </a>
+        <a class="home-card" href="./rhythm-knob.html">
+          <span class="home-card-num">04</span>
+          <h2>리듬 노브</h2>
+          <p>두 노브와 버튼으로 타이밍 노트를 맞추는 리듬 게임</p>
         </a>
       </div>
     </main>
