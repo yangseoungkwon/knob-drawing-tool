@@ -290,6 +290,18 @@ function renderPalette() {
   });
 }
 
+// ── 캔버스 크기별 기본 감도 ───────────────────────────────
+// 펌웨어 STEP_PIXELS=2 기준 (slow=2px, medium=4px, fast=8px/detent)
+// 작은 캔버스 → medium 속도(4px)에서 1칸: threshold=4
+// 큰 캔버스  → slow 속도(2px)에서 1칸:   threshold=2 (가속이 빠른 이동 담당)
+const CANVAS_THRESHOLD = {
+  10:  4,  // slow: 2클릭/칸 | medium: 1클릭/칸 | fast: 2칸/클릭
+  15:  4,  // slow: 2클릭/칸 | medium: 1클릭/칸 | fast: 2칸/클릭
+  30:  2,  // slow: 1클릭/칸 | medium: 2칸/클릭 | fast: 4칸/클릭
+  50:  2,  // slow: 1클릭/칸 | medium: 2칸/클릭 | fast: 4칸/클릭
+  100: 2,  // slow: 1클릭/칸 | medium: 2칸/클릭 | fast: 4칸/클릭
+};
+
 // ── 캔버스 크기 적용 ──────────────────────────────────────
 function applyCanvasSize(size) {
   state.canvasSize = size;
@@ -298,6 +310,9 @@ function applyCanvasSize(size) {
   else if (size === 30) state.cellSize = 16;
   else if (size === 50) state.cellSize = 10;
   else state.cellSize = 6;
+
+  // 캔버스 크기에 맞는 감도 자동 설정
+  state.moveThreshold = CANVAS_THRESHOLD[size] ?? 2;
 
   canvas.width = size * state.cellSize;
   canvas.height = size * state.cellSize;

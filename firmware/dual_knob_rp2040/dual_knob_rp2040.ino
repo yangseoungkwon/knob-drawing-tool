@@ -15,8 +15,12 @@ static const uint8_t NEOPIXEL_COUNT = 1;
 
 // ===== Motion tuning =====
 static const int8_t STEP_PIXELS = 2;      // pixels per encoder detent — games control sensitivity
-static const int8_t MAX_DELTA_PER_SEND = 8;
+static const int8_t MAX_DELTA_PER_SEND = 24;
 static const uint16_t SEND_INTERVAL_MS = 2;
+static const uint16_t FAST_TURN_MS = 22;
+static const uint16_t MEDIUM_TURN_MS = 40;
+static const int8_t FAST_MULTIPLIER = 4;
+static const int8_t MEDIUM_MULTIPLIER = 2;
 static const bool INVERT_X = false;
 static const bool INVERT_Y = true;
 
@@ -31,6 +35,7 @@ struct EncoderState {
   uint8_t pinB;
   uint8_t lastAB;
   int32_t quarterSteps;
+  uint32_t lastDetentMs;
 };
 
 struct ButtonState {
@@ -41,8 +46,8 @@ struct ButtonState {
   uint32_t lastPressEventMs;
 };
 
-EncoderState leftEnc{LEFT_ENC_A_PIN, LEFT_ENC_B_PIN, 0, 0};
-EncoderState rightEnc{RIGHT_ENC_A_PIN, RIGHT_ENC_B_PIN, 0, 0};
+EncoderState leftEnc{LEFT_ENC_A_PIN, LEFT_ENC_B_PIN, 0, 0, 0};
+EncoderState rightEnc{RIGHT_ENC_A_PIN, RIGHT_ENC_B_PIN, 0, 0, 0};
 ButtonState leftBtn{LEFT_SW_PIN, false, false, 0, 0};
 ButtonState rightBtn{RIGHT_SW_PIN, false, false, 0, 0};
 
@@ -116,11 +121,35 @@ void updateEncoder(EncoderState &enc, int16_t &axisPending, bool invertAxis) {
 
   enc.quarterSteps += quarter;
   if (enc.quarterSteps >= 4) {
-    axisPending += invertAxis ? -STEP_PIXELS : STEP_PIXELS;
+    const uint32_t now = millis();
+    const uint32_t dt = (enc.lastDetentMs == 0) ? 1000 : (now - enc.lastDetentMs);
+    enc.lastDetentMs = now;
+
+    int8_t stepScale = 1;
+    if (dt <= FAST_TURN_MS) {
+      stepScale = FAST_MULTIPLIER;
+    } else if (dt <= MEDIUM_TURN_MS) {
+      stepScale = MEDIUM_MULTIPLIER;
+    }
+
+    const int16_t move = STEP_PIXELS * stepScale;
+    axisPending += invertAxis ? -move : move;
     enc.quarterSteps = 0;
     setLedMode(LED_ACTIVITY, 60);
   } else if (enc.quarterSteps <= -4) {
-    axisPending += invertAxis ? STEP_PIXELS : -STEP_PIXELS;
+    const uint32_t now = millis();
+    const uint32_t dt = (enc.lastDetentMs == 0) ? 1000 : (now - enc.lastDetentMs);
+    enc.lastDetentMs = now;
+
+    int8_t stepScale = 1;
+    if (dt <= FAST_TURN_MS) {
+      stepScale = FAST_MULTIPLIER;
+    } else if (dt <= MEDIUM_TURN_MS) {
+      stepScale = MEDIUM_MULTIPLIER;
+    }
+
+    const int16_t move = STEP_PIXELS * stepScale;
+    axisPending += invertAxis ? move : -move;
     enc.quarterSteps = 0;
     setLedMode(LED_ACTIVITY, 60);
   }
