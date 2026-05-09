@@ -22,6 +22,7 @@ const mazeResultTitle = document.getElementById("mazeResultTitle");
 const mazeResultText = document.getElementById("mazeResultText");
 const mazeNextBtn = document.getElementById("mazeNextBtn");
 const mazeReplayBtn = document.getElementById("mazeReplayBtn");
+const pointerState = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 const mazeSensDecBtn = document.getElementById("mazeSensDecBtn");
 const mazeSensIncBtn = document.getElementById("mazeSensIncBtn");
 const mazeSensStateEl = document.getElementById("mazeSensState");
@@ -73,7 +74,16 @@ const mouseMoveState = {
   accY: 0
 };
 
-// 감도: 이 px 만큼 누산되면 한 칸 이동 (노브 2px 기준 → 기본 1클릭/칸)
+// ── 부드러운 렌더링 상태 ──────────────────────────────────
+const renderState = {
+  visualX: 0,   // 현재 렌더 위치 (pixel)
+  visualY: 0,
+  rafId: null
+};
+
+// lerp 계수 — 0.28 @ 60fps: 빠르지만 슬라이딩 느낌 유지
+const LERP = 0.28;
+
 let MOUSE_MOVE_THRESHOLD = 2;
 const RANKING_STORAGE_KEY = "dual-knob-maze-best-records-v1";
 
@@ -197,11 +207,49 @@ function updateMazeStatus() {
   }`;
 }
 
+function placeResultDialogNearPointer() {
+  const dialog = mazeResultOverlay.querySelector(".dialog");
+  if (!dialog || mazeResultOverlay.classList.contains("hidden")) return;
+  const margin = 12;
+  const rect = dialog.getBoundingClientRect();
+  const x = Math.min(
+    Math.max(pointerState.x - rect.width / 2, margin),
+    window.innerWidth - rect.width - margin
+  );
+  const y = Math.min(
+    Math.max(pointerState.y - rect.height / 2, margin),
+    window.innerHeight - rect.height - margin
+  );
+  dialog.style.position = "fixed";
+  dialog.style.left = `${x}px`;
+  dialog.style.top = `${y}px`;
+  dialog.style.margin = "0";
+}
+
+// ── 공의 목표 픽셀 좌표 ───────────────────────────────────
+function getTargetPx() {
+  return {
+    x: mazeState.player.x * mazeState.cellPx + mazeState.cellPx / 2,
+    y: mazeState.player.y * mazeState.cellPx + mazeState.cellPx / 2
+  };
+}
+
+// ── 메인 렌더 루프 (rAF) ──────────────────────────────────
 function drawMaze() {
-  const { grid, size, cellPx, player, goal } = mazeState;
+  const { grid, size, cellPx, goal } = mazeState;
+
+  // lerp 시각 위치 → 목표 위치
+  const tgt = getTargetPx();
+  renderState.visualX += (tgt.x - renderState.visualX) * LERP;
+  renderState.visualY += (tgt.y - renderState.visualY) * LERP;
+  if (Math.abs(tgt.x - renderState.visualX) < 0.4) renderState.visualX = tgt.x;
+  if (Math.abs(tgt.y - renderState.visualY) < 0.4) renderState.visualY = tgt.y;
+
+  // 배경
   mazeCtx.fillStyle = "#111827";
   mazeCtx.fillRect(0, 0, mazeCanvas.width, mazeCanvas.height);
 
+  // 통로
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
       if (grid[y][x] === 1) {
@@ -211,19 +259,62 @@ function drawMaze() {
     }
   }
 
+  // 도착점 — 부드러운 녹색 글로우
+  const gx = goal.x * cellPx;
+  const gy = goal.y * cellPx;
+  mazeCtx.fillStyle = "rgba(34, 197, 94, 0.25)";
+  mazeCtx.fillRect(gx - 2, gy - 2, cellPx + 4, cellPx + 4);
   mazeCtx.fillStyle = "#22c55e";
-  mazeCtx.fillRect(goal.x * cellPx, goal.y * cellPx, cellPx, cellPx);
+  mazeCtx.fillRect(gx, gy, cellPx, cellPx);
 
-  mazeCtx.fillStyle = "#2563eb";
+  // 공 글로우
+  const radius = Math.max(cellPx * 0.33, 4);
+  const grd = mazeCtx.createRadialGradient(
+    renderState.visualX, renderState.visualY, 0,
+    renderState.visualX, renderState.visualY, radius * 2.4
+  );
+  grd.addColorStop(0, "rgba(96, 165, 250, 0.45)");
+  grd.addColorStop(1, "rgba(96, 165, 250, 0)");
+  mazeCtx.fillStyle = grd;
+  mazeCtx.beginPath();
+  mazeCtx.arc(renderState.visualX, renderState.visualY, radius * 2.4, 0, Math.PI * 2);
+  mazeCtx.fill();
+
+  // 공 본체
+  mazeCtx.fillStyle = "#3b82f6";
+  mazeCtx.beginPath();
+  mazeCtx.arc(renderState.visualX, renderState.visualY, radius, 0, Math.PI * 2);
+  mazeCtx.fill();
+
+  // 하이라이트
+  mazeCtx.fillStyle = "rgba(255, 255, 255, 0.35)";
   mazeCtx.beginPath();
   mazeCtx.arc(
-    player.x * cellPx + cellPx / 2,
-    player.y * cellPx + cellPx / 2,
-    Math.max(cellPx * 0.33, 4),
+    renderState.visualX - radius * 0.28,
+    renderState.visualY - radius * 0.28,
+    radius * 0.42,
     0,
     Math.PI * 2
   );
   mazeCtx.fill();
+
+  renderState.rafId = requestAnimationFrame(drawMaze);
+}
+
+function startRenderLoop() {
+  if (renderState.rafId) cancelAnimationFrame(renderState.rafId);
+  // 새 스테이지 시작 시 시각 위치를 논리 위치로 즉시 스냅
+  const tgt = getTargetPx();
+  renderState.visualX = tgt.x;
+  renderState.visualY = tgt.y;
+  renderState.rafId = requestAnimationFrame(drawMaze);
+}
+
+function stopRenderLoop() {
+  if (renderState.rafId) {
+    cancelAnimationFrame(renderState.rafId);
+    renderState.rafId = null;
+  }
 }
 
 function onStageFailed() {
@@ -235,6 +326,7 @@ function onStageFailed() {
   mazeResultTitle.textContent = "TIME OVER";
   mazeResultText.textContent = `${mazeState.stageIndex + 1}단계 실패! 현재 누적 기록: ${formatTimeSec(mazeState.totalElapsedMs)}`;
   mazeResultOverlay.classList.remove("hidden");
+  requestAnimationFrame(placeResultDialogNearPointer);
   mazeMessageEl.textContent = "시간 초과! 다시 도전하세요.";
   updateMazeStatus();
 }
@@ -283,7 +375,7 @@ function setupStage(size) {
   const totalStageCount = LEVEL_PRESETS[mazeState.difficulty].length;
   mazeMessageEl.textContent = `${mazeState.stageIndex + 1}단계 / ${totalStageCount}단계: ${size}x${size} 제한시간 클리어!`;
   updateMazeStatus();
-  drawMaze();
+  startRenderLoop();
   startTimer();
 }
 
@@ -313,6 +405,7 @@ function finishAllStages() {
     isNewRecord ? " (신기록!)" : ""
   }`;
   mazeResultOverlay.classList.remove("hidden");
+  requestAnimationFrame(placeResultDialogNearPointer);
   mazeMessageEl.textContent = `${totalStageCount}판 클리어 완료! 총 기록 ${formatTimeSec(mazeState.totalElapsedMs)}`;
   updateMazeStatus();
 }
@@ -342,6 +435,7 @@ function onStageClear() {
   )}`;
   mazeNextBtn.classList.remove("hidden");
   mazeResultOverlay.classList.remove("hidden");
+  requestAnimationFrame(placeResultDialogNearPointer);
   mazeMessageEl.textContent = `클리어! 스테이지 기록 ${formatTimeSec(stageElapsed)}`;
   updateMazeStatus();
 }
@@ -361,7 +455,7 @@ function attemptMove(dx, dy) {
   if (mazeState.player.x === mazeState.goal.x && mazeState.player.y === mazeState.goal.y) {
     onStageClear();
   }
-  drawMaze();
+  // 렌더는 rAF 루프가 처리
 }
 
 function consumeMouseMoveDelta(dx, dy) {
@@ -421,6 +515,8 @@ mazeCanvas.addEventListener("mousedown", (event) => {
 });
 
 window.addEventListener("mousemove", (event) => {
+  pointerState.x = event.clientX;
+  pointerState.y = event.clientY;
   if (!mazeState.controlStarted) return;
   if (!mouseMoveState.active) {
     mouseMoveState.active = true;
