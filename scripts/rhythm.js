@@ -514,7 +514,7 @@ function frame() {
 }
 
 function startGame() {
-  ensureAudioContext();
+  try { ensureAudioContext(); } catch (_e) { /* audio unavailable */ }
   resetGameState();
   state.running = true;
   state.paused = false;

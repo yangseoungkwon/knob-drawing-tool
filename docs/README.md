@@ -4,9 +4,9 @@
 
 ## 폴더 구조
 
-- `pages/`: 화면 파일 (`index`, `knob-drawing`, `maze`)
-- `scripts/`: 기능 스크립트 (`knob.js`, `maze.js`)
-- `styles/`: 스타일 파일 (`style.css`, `maze.css`)
+- `pages/`: 화면 파일 (`index`, `knob-drawing`, `maze`, `safe-crack`, `rhythm-knob`)
+- `scripts/`: 기능 스크립트 (`knob.js`, `maze.js`, `safe.js`, `rhythm.js`)
+- `styles/`: 스타일 파일 (`style.css`, `maze.css`, `safe.css`, `rhythm.css`)
 - `assets/`: 아이콘/가이드 이미지
 - `docs/`: 문서
 
@@ -15,6 +15,8 @@
 - `pages/index.html`: 홈 페이지
 - `pages/knob-drawing.html`: 노브 드로잉 서브페이지
 - `pages/maze.html`: 노브 매핑형 미로 탈출게임 서브페이지
+- `pages/safe-crack.html`: 듀얼 다이얼 금고 따기 퍼즐 서브페이지
+- `pages/rhythm-knob.html`: 듀얼 노브 리듬 게임 서브페이지
 
 ## 실행 방법
 
@@ -29,6 +31,8 @@ python3 -m http.server 8080
 - 홈: `http://localhost:8080/pages/index.html`
 - 노브 드로잉: `http://localhost:8080/pages/knob-drawing.html`
 - 미로 게임: `http://localhost:8080/pages/maze.html`
+- 금고 따기: `http://localhost:8080/pages/safe-crack.html`
+- 리듬 노브: `http://localhost:8080/pages/rhythm-knob.html`
 
 ## RP2040 펌웨어 시작점
 
