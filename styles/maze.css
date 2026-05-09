@@ -1,147 +1,234 @@
-.maze-app {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 14px 16px 20px;
-  border-radius: 12px;
-  border: 1px solid #8b5e34;
-  background: rgba(255, 248, 235, 0.92);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+/* ── Maze: page shell ─────────────────────────────────── */
+.maze-body {
+  background: #0f172a;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px 40px;
 }
 
-.maze-header {
+.maze-app {
+  width: min(98vw, 1100px);
   display: flex;
+  flex-direction: column;
+  max-height: 1440px;
+}
+
+/* ── Toolbar ──────────────────────────────────────────── */
+.maze-toolbar {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 14px 14px 0 0;
+  border-bottom: none;
+}
+
+.maze-toolbar-left {
+  display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  flex-wrap: wrap;
 }
 
-.maze-header h1 {
-  margin: 0;
+.maze-app-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #475569;
+  text-transform: uppercase;
 }
 
-.maze-actions {
+.maze-toolbar-right {
   display: flex;
   gap: 8px;
 }
 
-.timer-board-wrap {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.maze-toolbar .size-btn {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  border-radius: 8px;
 }
 
-.timer-board-group {
+.maze-toolbar .size-btn:hover {
+  background: #475569;
+  border-color: #818cf8;
+  color: #e2e8f0;
+}
+
+/* ── Timer boards ─────────────────────────────────────── */
+.maze-timers {
+  display: flex;
+  gap: 10px;
+}
+
+.maze-timer-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
-.timer-board-label {
-  font-size: 0.78rem;
+.maze-timer-label {
+  font-size: 0.6rem;
   font-weight: 700;
-  color: #111827;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-transform: uppercase;
 }
 
-.timer-board {
-  min-width: 210px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: 2px solid #0f172a;
-  background: #000000;
+.maze-timer-board {
+  min-width: 130px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 1px solid #1e3a5f;
+  background: #020817;
   color: #ef4444;
   font-family: "Courier New", Courier, monospace;
-  font-size: 1.7rem;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: 2px;
   text-align: center;
-  text-shadow: 0 0 10px rgba(239, 68, 68, 0.55);
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
 
+/* ── Workspace ────────────────────────────────────────── */
 .maze-workspace {
-  width: 100%;
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
+  align-items: stretch;
+  border: 1px solid #334155;
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  flex: 1;
 }
 
+/* ── Side panel ───────────────────────────────────────── */
 .maze-panel {
-  min-width: 220px;
-  background: #fffdf5;
-  border: 1px solid #d6c49f;
-  border-radius: 12px;
-  padding: 12px;
+  width: 180px;
+  flex-shrink: 0;
+  background: #1e293b;
+  border-right: 1px solid #334155;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.maze-panel h2 {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-}
-
-.maze-panel p {
-  margin: 0 0 6px;
-  font-size: 0.92rem;
-}
-
-.maze-state {
+.maze-panel-section {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin: 10px 0;
 }
 
-.maze-message {
-  margin-top: 10px;
+.maze-panel-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #475569;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.maze-guide-line {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.maze-guide-line strong {
+  color: #94a3b8;
   font-weight: 600;
-  color: #7c2d12;
 }
 
-.maze-sensitivity {
+.maze-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.maze-sens-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
 }
 
+.maze-panel .size-btn {
+  background: #334155;
+  border-color: #475569;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.maze-panel .size-btn:hover {
+  background: #475569;
+  border-color: #818cf8;
+  color: #e2e8f0;
+}
+
+.maze-message {
+  margin-top: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #818cf8;
+  line-height: 1.4;
+}
+
+/* ── Canvas area ──────────────────────────────────────── */
 .maze-canvas-wrap {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 24px;
   overflow: auto;
+  background-color: #0f172a;
+  background-image: radial-gradient(circle, #1e293b 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 #mazeCanvas {
-  border: 3px solid #7a4e2a;
-  background: #fff;
   display: block;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
-#mazeStartOverlay .dialog {
-  width: min(90vw, 980px);
-  text-align: center;
-}
-
-#mazeStartControlBtn {
-  display: block;
-  width: min(86vw, 920px);
-  height: min(72vh, 760px);
-  margin: 10px auto 0;
-  font-size: clamp(2rem, 6vw, 4rem);
-  font-weight: 800;
-  border-radius: 18px;
-  border: 3px solid #7a4e2a;
-  background: #fef3c7;
-  color: #111827;
-}
-
-#mazeStartControlBtn:hover {
-  background: #fde68a;
-}
-
+/* ── Difficulty button active ──────────────────────────── */
 .difficulty-btn.active {
-  background: #2563eb;
+  background: #4f46e5;
   color: #ffffff;
-  border-color: #1d4ed8;
+  border-color: #6366f1;
+}
+
+/* ── Big start button in dialog ───────────────────────── */
+.maze-big-start-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding: 18px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: "Inter", sans-serif;
+  border-radius: 12px;
+  border: 1.5px solid #818cf8;
+  background: #1e293b;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.maze-big-start-btn:hover {
+  background: #334155;
+  border-color: #a5b4fc;
 }
