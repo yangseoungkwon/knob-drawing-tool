@@ -361,7 +361,7 @@ function setupStage(size) {
   mazeState.stageElapsedMs = 0;
   mazeState.timeLeftMs = computeStageTimeMs(size);
 
-  mazeState.cellPx = Math.max(Math.floor(720 / size), 12);
+  mazeState.cellPx = Math.max(Math.floor(580 / size), 10);
   mazeCanvas.width = mazeState.cellPx * size;
   mazeCanvas.height = mazeState.cellPx * size;
 
