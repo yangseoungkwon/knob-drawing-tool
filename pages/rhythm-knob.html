@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dual Knob Rhythm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/rhythm.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Rhythm Knob</span>
+        </div>
+        <div class="maze-timers">
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">남은시간</span>
+            <div id="rhythmTimeBoard" class="maze-timer-board">00:00.0</div>
+          </div>
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">점수 / 콤보</span>
+            <div id="rhythmScoreBoard" class="maze-timer-board">0 / x0</div>
+          </div>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="rhythmStartBtn" class="size-btn" type="button">시작</button>
+          <button id="rhythmResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브 회전</strong> 빨강 인디케이터</p>
+            <p class="maze-guide-line"><strong>우 노브 회전</strong> 파랑 인디케이터</p>
+            <p class="maze-guide-line"><strong>좌 클릭</strong> 빨강 레인 판정</p>
+            <p class="maze-guide-line"><strong>우 클릭</strong> 파랑 레인 판정</p>
+            <p class="maze-guide-line"><strong>중클릭</strong> 일시정지</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">상태</p>
+            <div class="maze-status-list">
+              <span id="rhythmDifficultyState" class="status">Difficulty: -</span>
+              <span id="rhythmAccuracyState" class="status">Accuracy: 0%</span>
+              <span id="rhythmBestState" class="status">Best: -</span>
+              <span id="rhythmStatsState" class="status">P/G/O/M: 0/0/0/0</span>
+              <span id="rhythmMissStackState" class="status">Miss Stack: 0/0</span>
+            </div>
+          </div>
+          <p id="rhythmMessage" class="maze-message">난이도를 선택하고 시작하세요.</p>
+        </aside>
+
+        <!-- ── 듀얼 레인 ── -->
+        <div class="rhythm-stage">
+          <div class="rhythm-lane lane-left">
+            <div class="lane-header">
+              <span class="lane-knob">LEFT KNOB</span>
+              <span class="lane-key">좌 클릭 판정</span>
+            </div>
+            <div id="leftTrack" class="lane-track">
+              <div class="judge-line"></div>
+              <div id="indicatorRed" class="indicator red"></div>
+            </div>
+          </div>
+
+          <div class="lane-divider">
+            <div id="rhythmJudgeText" class="judge-text">READY</div>
+          </div>
+
+          <div class="rhythm-lane lane-right">
+            <div class="lane-header">
+              <span class="lane-knob">RIGHT KNOB</span>
+              <span class="lane-key">우 클릭 판정</span>
+            </div>
+            <div id="rightTrack" class="lane-track">
+              <div class="judge-line"></div>
+              <div id="indicatorBlue" class="indicator blue"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="rhythmStartOverlay" class="overlay">
+      <div class="dialog rhythm-dialog">
+        <h2>Rhythm Knob</h2>
+        <p>두 레인이 독립적으로 진행됩니다.<br>
+          <strong style="color:#fb7185">좌 노브</strong>로 빨강 레인 인디케이터를,
+          <strong style="color:#60a5fa">우 노브</strong>로 파랑 레인 인디케이터를 조작하세요.</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="rhythmStartControlBtn" class="maze-big-start-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="rhythmResultOverlay" class="overlay hidden">
+      <div class="dialog rhythm-dialog">
+        <h2 id="rhythmResultTitle">RESULT</h2>
+        <p id="rhythmResultText">결과를 확인하세요.</p>
+        <button id="rhythmReplayBtn" class="size-btn" type="button">다시 도전</button>
+      </div>
+    </div>
+
+    <script src="../scripts/rhythm.js"></script>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dual Knob Safe Cracking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/safe.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Safe Cracking</span>
+        </div>
+        <div class="maze-timers">
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">제한시간</span>
+            <div id="safeLimitBoard" class="maze-timer-board">00:00.0</div>
+          </div>
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">내기록</span>
+            <div id="safeRecordBoard" class="maze-timer-board">00:00.0</div>
+          </div>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="safeStartBtn" class="size-btn" type="button">시작</button>
+          <button id="safeResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브 회전</strong> 다이얼 A</p>
+            <p class="maze-guide-line"><strong>우 노브 회전</strong> 다이얼 B</p>
+            <p class="maze-guide-line"><strong>노브 클릭</strong> 핀 해제 시도</p>
+            <p class="maze-guide-line"><strong>실패 시</strong> 시간 -3초</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">상태</p>
+            <div class="maze-status-list">
+              <span id="safeDifficultyState" class="status">Difficulty: -</span>
+              <span id="safeStageState" class="status">Stage: 0</span>
+              <span id="safePinState" class="status">Pins: 0/0</span>
+              <span id="safeDialAState" class="status">Dial A: 0</span>
+              <span id="safeDialBState" class="status">Dial B: 0</span>
+              <span id="safeBestRecordState" class="status">Best: -</span>
+            </div>
+          </div>
+          <p id="safeMessage" class="maze-message">난이도를 선택하고 시작하세요.</p>
+        </aside>
+
+        <div class="safe-stage">
+          <div class="dial-card">
+            <span class="dial-label">DIAL A (좌 노브)</span>
+            <svg id="dialA" class="dial" viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="dial-bg" cx="100" cy="100" r="92" />
+              <circle class="dial-glow" cx="100" cy="100" r="92" />
+              <g class="dial-ticks"></g>
+              <g class="dial-numbers"></g>
+              <g class="dial-pointer-group">
+                <line class="dial-pointer" x1="100" y1="100" x2="100" y2="20" />
+              </g>
+              <circle class="dial-hub" cx="100" cy="100" r="10" />
+              <text class="dial-value" x="100" y="160" text-anchor="middle">00</text>
+            </svg>
+          </div>
+
+          <div class="pin-rack">
+            <h3>PINS</h3>
+            <div id="pinTrack" class="pin-track"></div>
+            <p id="pinHint" class="pin-hint">다이얼을 정답에 맞춘 뒤 노브를 클릭하세요.</p>
+          </div>
+
+          <div class="dial-card">
+            <span class="dial-label">DIAL B (우 노브)</span>
+            <svg id="dialB" class="dial" viewBox="0 0 200 200" aria-hidden="true">
+              <circle class="dial-bg" cx="100" cy="100" r="92" />
+              <circle class="dial-glow" cx="100" cy="100" r="92" />
+              <g class="dial-ticks"></g>
+              <g class="dial-numbers"></g>
+              <g class="dial-pointer-group">
+                <line class="dial-pointer" x1="100" y1="100" x2="100" y2="20" />
+              </g>
+              <circle class="dial-hub" cx="100" cy="100" r="10" />
+              <text class="dial-value" x="100" y="160" text-anchor="middle">00</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="safeStartOverlay" class="overlay">
+      <div class="dialog">
+        <h2>Safe Cracking</h2>
+        <p>두 노브로 다이얼 A·B를 맞춰 핀을 하나씩 풀어 금고를 여세요.</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="safeStartControlBtn" class="maze-big-start-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="safeResultOverlay" class="overlay hidden">
+      <div class="dialog">
+        <h2 id="safeResultTitle">RESULT</h2>
+        <p id="safeResultText">결과를 확인하고 다음으로 이동하세요.</p>
+        <div class="size-options">
+          <button id="safeNextBtn" class="size-btn hidden" type="button">다음 스테이지</button>
+          <button id="safeReplayBtn" class="size-btn" type="button">다시 도전</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../scripts/safe.js"></script>
+  </body>
+</html>
