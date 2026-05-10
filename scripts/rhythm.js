@@ -33,39 +33,39 @@ const SCORING = { perfect: 1000, good: 600, ok: 250, miss: 0 };
 const DIFFICULTY = {
   easy: {
     label: "초급",
-    bpm: 72,
-    approachMs: 2200,
-    notePctW: 0.22,       // 넓은 노트
-    indicatorPctW: 0.20,  // 넓은 인디케이터
-    posTolPct: 0.22,      // 관대한 위치 허용
-    timing: { perfect: 90, good: 160, ok: 220 },
-    missLimit: 8,
-    totalNotes: 28,
+    bpm: 48,
+    approachMs: 3200,
+    notePctW: 0.26,
+    indicatorPctW: 0.24,
+    posTolPct: 0.30,
+    timing: { perfect: 140, good: 240, ok: 340 },
+    missLimit: 12,
+    totalNotes: 20,
     chordChance: 0.0
   },
   normal: {
     label: "중급",
-    bpm: 95,
-    approachMs: 1700,
-    notePctW: 0.13,
-    indicatorPctW: 0.11,
-    posTolPct: 0.11,
-    timing: { perfect: 55, good: 100, ok: 155 },
-    missLimit: 5,
-    totalNotes: 48,
-    chordChance: 0.10
+    bpm: 68,
+    approachMs: 2400,
+    notePctW: 0.16,
+    indicatorPctW: 0.14,
+    posTolPct: 0.16,
+    timing: { perfect: 85, good: 150, ok: 220 },
+    missLimit: 8,
+    totalNotes: 36,
+    chordChance: 0.05
   },
   hard: {
     label: "고급",
-    bpm: 128,
-    approachMs: 1250,
-    notePctW: 0.08,
-    indicatorPctW: 0.07,
-    posTolPct: 0.06,
-    timing: { perfect: 35, good: 70, ok: 110 },
-    missLimit: 3,
-    totalNotes: 68,
-    chordChance: 0.28
+    bpm: 90,
+    approachMs: 1800,
+    notePctW: 0.10,
+    indicatorPctW: 0.09,
+    posTolPct: 0.09,
+    timing: { perfect: 50, good: 95, ok: 145 },
+    missLimit: 5,
+    totalNotes: 52,
+    chordChance: 0.15
   }
 };
 
@@ -280,9 +280,9 @@ function buildChart() {
     };
     notes.push(note);
 
-    let advance = beatMs;
-    if (state.difficulty === "easy") advance = beatMs * 2;
-    if (state.difficulty === "hard" && Math.random() < 0.35) advance = beatMs * 0.5;
+    let advance = beatMs * 2;
+    if (state.difficulty === "easy") advance = beatMs * 3;
+    if (state.difficulty === "hard" && Math.random() < 0.3) advance = beatMs * 0.75;
 
     // chord: 동시에 반대 레인에 노트 추가
     if (Math.random() < cfg.chordChance && i + 1 < cfg.totalNotes) {
