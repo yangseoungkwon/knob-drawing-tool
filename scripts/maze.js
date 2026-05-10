@@ -42,9 +42,9 @@ const DIFFICULTY_LABEL = {
 const DIFFICULTY_TIME_SCALE = {
   easy: 1.2,
   normal: 1.0,
-  hard: 0.82
+  hard: 1.3
 };
-const STAGE_LIMIT_SECONDS = [30, 30, 50, 50, 70, 70, 90, 90, 100, 100];
+const STAGE_LIMIT_SECONDS = [30, 30, 50, 50, 70, 70, 90, 90, 110, 110];
 
 const mazeState = {
   size: 15,
