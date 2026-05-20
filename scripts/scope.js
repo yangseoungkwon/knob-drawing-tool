@@ -13,6 +13,10 @@ const scopeRoundStateEl  = document.getElementById("scopeRoundState");
 const scopeMatchStateEl  = document.getElementById("scopeMatchState");
 const scopeBestStateEl   = document.getElementById("scopeBestState");
 const scopeMessageEl     = document.getElementById("scopeMessage");
+const scopePhaseBoxEl    = document.getElementById("scopePhaseBox");
+const scopePhaseIconEl   = document.getElementById("scopePhaseIcon");
+const scopePhaseTextEl   = document.getElementById("scopePhaseText");
+const scopeGuideEl       = document.getElementById("scopeGuide");
 
 const scopeStartBtn        = document.getElementById("scopeStartBtn");
 const scopeResetBtn        = document.getElementById("scopeResetBtn");
@@ -385,6 +389,50 @@ function saveBest(score) {
   } catch { /* ignore */ }
 }
 
+// ── Phase guide ───────────────────────────────────────────────────
+function setPhase(phase, icon, text, guide) {
+  const cls = ["scope-phase-idle","scope-phase-reveal","scope-phase-play","scope-phase-good","scope-phase-done"];
+  scopePhaseBoxEl.classList.remove(...cls);
+  scopePhaseBoxEl.classList.add(`scope-phase-${phase}`);
+  scopePhaseIconEl.textContent = icon;
+  scopePhaseTextEl.textContent = text;
+  scopeGuideEl.textContent     = guide;
+}
+
+function updatePhaseGuide() {
+  if (!state.running) {
+    setPhase("idle", "●", "대기 중",
+      "난이도를 선택하고 시작 버튼을 누르세요.");
+    return;
+  }
+  if (state.paused) {
+    setPhase("idle", "⏸", "일시정지",
+      "중클릭으로 재개할 수 있습니다.");
+    return;
+  }
+  if (state.revealActive) {
+    setPhase("reveal", "◉", "① 파형 기억 중",
+      "청색 파형의 모양을 눈에 담으세요.\n곧 희미해집니다. 특징적인 곡선 수와 대칭을 기억하세요.");
+    return;
+  }
+  if (state.submitted) {
+    setPhase("done", "✓", "④ 제출 완료",
+      "다음 라운드 준비 중...");
+    return;
+  }
+  const acc = calcAccuracy();
+  if (acc < 0.35) {
+    setPhase("play", "◎", "② 주파수 조절 중",
+      "좌 노브(↕)를 돌려 X 주파수를,\n우 노브(↔)를 돌려 Y 주파수를 바꾸세요.\n초록 파형이 청색과 닮아지도록 조절하세요.");
+  } else if (acc < 0.70) {
+    setPhase("play", "◎", "② 조금 더 가까이",
+      `MATCH ${Math.round(acc * 100)}% — 비슷해지고 있어요!\n더 세밀하게 조절해 보세요.\n패턴 모양이 거의 같아지면 클릭하세요.`);
+  } else {
+    setPhase("good", "◉", "③ 클릭으로 제출!",
+      `MATCH ${Math.round(acc * 100)}% — 훌륭합니다!\n지금 클릭하면 높은 점수를 받습니다.\n더 정밀하게 맞추면 점수가 올라요.`);
+  }
+}
+
 // ── Status sidebar ────────────────────────────────────────────────
 function updateStatus() {
   const d = cfg();
@@ -395,6 +443,7 @@ function updateStatus() {
   scopeBestStateEl.textContent  = `Best: ${loadBest() ?? "-"}`;
   scopeScoreBoardEl.textContent = String(state.totalScore);
   scopeRoundBoardEl.textContent = `${state.round} / ${d.rounds}`;
+  updatePhaseGuide();
 }
 
 // ── Frame loop ────────────────────────────────────────────────────

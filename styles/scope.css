@@ -24,12 +24,55 @@
   gap: 14px;
 }
 
-.scope-hint-green {
-  color: #00ff41;
+.scope-hint-green { color: #00ff41; }
+.scope-hint-blue  { color: #00dcff; }
+
+/* ── 실시간 단계 표시 ──────────────────────────────── */
+.scope-phase-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  margin-bottom: 8px;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.scope-hint-blue {
-  color: #00dcff;
+.scope-phase-idle   { border-color: #334155; background: #0f172a; }
+.scope-phase-reveal { border-color: rgba(0,220,255,0.5); background: rgba(0,220,255,0.06); }
+.scope-phase-play   { border-color: rgba(0,255,65,0.4);  background: rgba(0,255,65,0.05);  }
+.scope-phase-good   { border-color: rgba(0,255,65,0.8);  background: rgba(0,255,65,0.10);  }
+.scope-phase-done   { border-color: rgba(250,204,21,0.6);background: rgba(250,204,21,0.07);}
+
+.scope-phase-icon {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+.scope-phase-idle   .scope-phase-icon { color: #475569; }
+.scope-phase-reveal .scope-phase-icon { color: #00dcff; }
+.scope-phase-play   .scope-phase-icon { color: #00ff41; }
+.scope-phase-good   .scope-phase-icon { color: #00ff41; }
+.scope-phase-done   .scope-phase-icon { color: #facc15; }
+
+.scope-phase-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.scope-phase-idle   .scope-phase-text { color: #475569; }
+.scope-phase-reveal .scope-phase-text { color: #00dcff; }
+.scope-phase-play   .scope-phase-text { color: #4ade80; }
+.scope-phase-good   .scope-phase-text { color: #00ff41; }
+.scope-phase-done   .scope-phase-text { color: #facc15; }
+
+.scope-guide-text {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.55;
+  white-space: pre-line;
+  margin: 0;
 }
 
 .difficulty-btn.active {

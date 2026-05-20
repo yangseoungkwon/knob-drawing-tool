@@ -37,19 +37,25 @@
 
       <section class="maze-workspace">
         <aside class="maze-panel">
+
+          <!-- 실시간 단계 안내 -->
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">현재 단계</p>
+            <div id="scopePhaseBox" class="scope-phase-box scope-phase-idle">
+              <span id="scopePhaseIcon" class="scope-phase-icon">●</span>
+              <span id="scopePhaseText" class="scope-phase-text">대기 중</span>
+            </div>
+            <p id="scopeGuide" class="scope-guide-text">난이도를 선택하고 시작 버튼을 누르세요.</p>
+          </div>
+
           <div class="maze-panel-section">
             <p class="maze-panel-label">조작법</p>
-            <p class="maze-guide-line"><strong>좌 노브</strong> X 주파수 조절</p>
-            <p class="maze-guide-line"><strong>우 노브</strong> Y 주파수 조절</p>
+            <p class="maze-guide-line"><strong>좌 노브 ↕</strong> X 주파수</p>
+            <p class="maze-guide-line"><strong>우 노브 ↔</strong> Y 주파수</p>
             <p class="maze-guide-line"><strong>좌/우 클릭</strong> 제출</p>
             <p class="maze-guide-line"><strong>중클릭</strong> 일시정지</p>
           </div>
-          <div class="maze-panel-section">
-            <p class="maze-panel-label">방법</p>
-            <p class="maze-guide-line">목표 파형 <strong class="scope-hint-blue">청색</strong> 으로 표시</p>
-            <p class="maze-guide-line">내 파형 <strong class="scope-hint-green">초록</strong> 으로 표시</p>
-            <p class="maze-guide-line">기억 후 두 노브로 재현</p>
-          </div>
+
           <div class="maze-panel-section">
             <p class="maze-panel-label">상태</p>
             <div class="maze-status-list">
