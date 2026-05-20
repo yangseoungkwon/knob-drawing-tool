@@ -49,7 +49,17 @@ const state = {
 
 // threshold=2 = 펌웨어 STEP_PIXELS(slow) → 1클릭=1칸
 // 가속(medium×3, fast×6, turbo×9)은 if+reset으로 드로잉에서 차단
-const CANVAS_THRESHOLD = { 10: 2, 15: 2, 30: 2, 50: 2, 100: 2 };
+const CANVAS_THRESHOLD = { 10: 2, 15: 2, 30: 2, 50: 2, 100: 2, 200: 2 };
+
+/** 그리드 칸 수 → 픽셀 셀 크기 (캔버스 표시 크기 ≈ grid² × cellSize) */
+const CELL_SIZE_BY_GRID = {
+  10: 40,
+  15: 28,
+  30: 16,
+  50: 10,
+  100: 6,
+  200: 3
+};
 
 let lastMouseX = null;
 let lastMouseY = null;
@@ -333,11 +343,7 @@ function renderPalette() {
 // ── 캔버스 크기 적용 ──────────────────────────────────────
 function applyCanvasSize(size) {
   state.canvasSize = size;
-  if (size === 10) state.cellSize = 40;
-  else if (size === 15) state.cellSize = 28;
-  else if (size === 30) state.cellSize = 16;
-  else if (size === 50) state.cellSize = 10;
-  else state.cellSize = 6;
+  state.cellSize = CELL_SIZE_BY_GRID[size] ?? 6;
 
   state.moveThreshold = CANVAS_THRESHOLD[size] ?? 2;
 

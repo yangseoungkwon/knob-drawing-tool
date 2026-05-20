@@ -28,14 +28,10 @@ const RANKING_STORAGE_KEY = "dual-knob-pinball-best-v1";
 const W = canvas.width;
 const H = canvas.height;
 const BALL_R = 10;
-const DRAIN_CENTER = W / 2;
-const DRAIN_WIDTH = 220;
-const DRAIN_X1 = DRAIN_CENTER - DRAIN_WIDTH / 2;
-const DRAIN_X2 = DRAIN_CENTER + DRAIN_WIDTH / 2;
-const DRAIN_Y = 655;
-const DRAIN_FUNNEL_Y = 580;
-const PLUNGER_X = 598;
-const PLUNGER_Y = 640;
+const LAUNCH_X = W / 2;
+const LAUNCH_Y = 65;
+const DRAIN_X1 = 265;
+const DRAIN_X2 = 375;
 
 const DIFFICULTY = {
   easy: { label: "초급", targetScore: 5000, gravity: 0.16, bumpMult: 1.0 },
@@ -45,45 +41,32 @@ const DIFFICULTY = {
 
 /** @type {[number, number, number, number][]} x1,y1,x2,y2 */
 const WALLS = [
-  [24, 24, 616, 24],
-  [24, 24, 24, 590],
-  [616, 24, 616, 590],
-  [24, 590, DRAIN_X1 - 8, 705],
-  [616, 590, DRAIN_X2 + 8, 705],
-  [500, 590, 616, 635],
-  [500, 635, 616, 710]
+  [24,  24,  616, 24],    // top
+  [24,  24,  24,  490],   // left outer vertical
+  [616, 24,  616, 490],   // right outer vertical
+  [24,  490, 155, 620],   // left angled guide → flipper pivot
+  [616, 490, 485, 620],   // right angled guide → flipper pivot
+  [155, 620, DRAIN_X1, H],  // left lower → drain left edge
+  [485, 620, DRAIN_X2, H],  // right lower → drain right edge
 ];
 
 const BUMPERS = [
-  { x: 320, y: 160, r: 30, score: 100, hue: 45 },
-  { x: 180, y: 260, r: 22, score: 50, hue: 320 },
-  { x: 460, y: 260, r: 22, score: 50, hue: 200 },
-  { x: 320, y: 340, r: 26, score: 80, hue: 120 },
-  { x: 130, y: 400, r: 18, score: 30, hue: 280 },
-  { x: 510, y: 400, r: 18, score: 30, hue: 15 }
+  { x: 320, y: 140, r: 28, score: 100, hue: 45 },
+  { x: 185, y: 225, r: 22, score:  50, hue: 320 },
+  { x: 455, y: 225, r: 22, score:  50, hue: 200 },
+  { x: 258, y: 330, r: 20, score:  80, hue: 120 },
+  { x: 382, y: 330, r: 20, score:  80, hue:  15 },
+  { x: 320, y: 425, r: 18, score:  60, hue: 280 },
 ];
 
 const TARGETS = [
-  { x: 90, y: 140, w: 14, h: 50, score: 200, lit: false },
-  { x: 536, y: 140, w: 14, h: 50, score: 200, lit: false },
-  { x: 313, y: 480, w: 14, h: 36, score: 150, lit: false }
+  { x:  60, y: 130, w: 14, h: 50, score: 200, lit: false },
+  { x: 566, y: 130, w: 14, h: 50, score: 200, lit: false },
+  { x: 313, y: 490, w: 14, h: 36, score: 150, lit: false },
 ];
 
-const LEFT_FLIPPER = {
-  px: 248,
-  py: 648,
-  len: 88,
-  rest: 0.62,
-  fire: -0.42
-};
-
-const RIGHT_FLIPPER = {
-  px: 392,
-  py: 648,
-  len: 88,
-  rest: Math.PI - 0.62,
-  fire: Math.PI + 0.42
-};
+const LEFT_FLIPPER  = { px: 155, py: 620, len: 130, rest:  0.40,          fire: -0.55 };
+const RIGHT_FLIPPER = { px: 485, py: 620, len: 130, rest: Math.PI - 0.40, fire: Math.PI + 0.55 };
 
 const state = {
   difficulty: "easy",
@@ -91,14 +74,13 @@ const state = {
   paused: false,
   score: 0,
   lives: 3,
-  ball: { x: PLUNGER_X, y: PLUNGER_Y, vx: 0, vy: 0, active: false },
+  ball: { x: LAUNCH_X, y: LAUNCH_Y, vx: 0, vy: 0, active: false },
   leftPress: 0,
   rightPress: 0,
   leftAngle: LEFT_FLIPPER.rest,
   rightAngle: RIGHT_FLIPPER.rest,
   leftAcc: 0,
   rightAcc: 0,
-  plungerPull: 0,
   nudgeCooldown: 0,
   rafId: 0,
   lastFrameMs: 0,
@@ -106,7 +88,7 @@ const state = {
   mouse: { active: false, lastX: 0, lastY: 0 }
 };
 
-let MOUSE_MOVE_THRESHOLD = 2;
+let MOUSE_MOVE_THRESHOLD = 1;
 let audioCtx = null;
 
 function cfg() {
@@ -194,13 +176,12 @@ function resetTargets() {
   });
 }
 
-function resetBallToPlunger() {
-  state.ball.x = PLUNGER_X;
-  state.ball.y = PLUNGER_Y;
+function resetBall() {
+  state.ball.x = LAUNCH_X;
+  state.ball.y = LAUNCH_Y;
   state.ball.vx = 0;
   state.ball.vy = 0;
   state.ball.active = false;
-  state.plungerPull = 0;
 }
 
 function resetRound() {
@@ -212,8 +193,8 @@ function resetRound() {
   state.rightAngle = RIGHT_FLIPPER.rest;
   state.nudgeCooldown = 0;
   resetTargets();
-  resetBallToPlunger();
-  pinballMessageEl.textContent = "좌 클릭으로 플런저 — 공을 쏘아 올리세요!";
+  resetBall();
+  pinballMessageEl.textContent = "좌 클릭으로 공을 떨어뜨리세요!";
 }
 
 function addScore(pts) {
@@ -341,38 +322,18 @@ function loseBallToDrain() {
   if (state.lives <= 0) {
     endGame(false);
   } else {
-    resetBallToPlunger();
+    resetBall();
     pinballMessageEl.textContent = `드레인! 남은 라이프 ${state.lives} — 좌 클릭으로 다시 발사`;
   }
   updateStatus();
 }
 
 function tryDrain() {
-  const { x, y, vy } = state.ball;
-  const inDrainX = x > DRAIN_X1 && x < DRAIN_X2;
-  const pastLip = y > DRAIN_Y && inDrainX;
-  const rollingIntoPit =
-    y > DRAIN_FUNNEL_Y + 40 && inDrainX && vy > 0.3 && y < DRAIN_Y + 30;
-  if (pastLip || rollingIntoPit) {
-    loseBallToDrain();
-    return true;
-  }
-  if (y > H + BALL_R && inDrainX) {
+  if (state.ball.y > H + BALL_R) {
     loseBallToDrain();
     return true;
   }
   return false;
-}
-
-function applyDrainFunnel(subScale) {
-  if (!state.ball.active || state.ball.y < DRAIN_FUNNEL_Y) return;
-  const { x, y } = state.ball;
-  if (x < DRAIN_X1 - 50 || x > DRAIN_X2 + 50) return;
-  const pull = (DRAIN_CENTER - x) * 0.035 * subScale;
-  state.ball.vx += pull;
-  if (y > DRAIN_FUNNEL_Y + 50) {
-    state.ball.vy += 0.04 * subScale;
-  }
 }
 
 function updateFlippers(dt) {
@@ -382,25 +343,23 @@ function updateFlippers(dt) {
 
   const leftTarget = LEFT_FLIPPER.rest + (LEFT_FLIPPER.fire - LEFT_FLIPPER.rest) * state.leftPress;
   const rightTarget = RIGHT_FLIPPER.rest + (RIGHT_FLIPPER.fire - RIGHT_FLIPPER.rest) * state.rightPress;
-  const lerp = 0.35;
-  state.leftAngle += (leftTarget - state.leftAngle) * lerp;
-  state.rightAngle += (rightTarget - state.rightAngle) * lerp;
+  const lerpUp   = 0.7;   // 올라갈 때 빠르게 스냅
+  const lerpDown = 0.25;  // 내려올 때 스프링처럼 부드럽게
+  const leftLerp  = leftTarget  > state.leftAngle  ? lerpDown : lerpUp;
+  const rightLerp = rightTarget < state.rightAngle ? lerpDown : lerpUp;
+  state.leftAngle  += (leftTarget  - state.leftAngle)  * leftLerp;
+  state.rightAngle += (rightTarget - state.rightAngle) * rightLerp;
 }
 
-function launchPlunger() {
-  if (!state.running || state.paused) return;
-  if (state.ball.active) return;
-  state.plungerPull = Math.min(1, state.plungerPull + 0.35);
-  if (state.plungerPull >= 1) {
-    state.ball.active = true;
-    state.ball.x = PLUNGER_X - 20;
-    state.ball.y = PLUNGER_Y - 30;
-    state.ball.vx = -4 - Math.random() * 2;
-    state.ball.vy = -11 - Math.random() * 3;
-    state.plungerPull = 0;
-    playTone(120, 60, "sawtooth", 0.07);
-    pinballMessageEl.textContent = "플리퍼로 공을 올려 유지하세요!";
-  }
+function launchBall() {
+  if (!state.running || state.paused || state.ball.active) return;
+  state.ball.active = true;
+  state.ball.x = LAUNCH_X + (Math.random() - 0.5) * 30;
+  state.ball.y = LAUNCH_Y;
+  state.ball.vx = (Math.random() - 0.5) * 2;
+  state.ball.vy = 2;
+  playTone(160, 60, "sine", 0.05);
+  pinballMessageEl.textContent = "플리퍼로 공을 받으세요!";
 }
 
 function nudgeTable() {
@@ -417,19 +376,18 @@ function nudgeTable() {
 function consumeMouseMoveDelta(dx, dy) {
   if (!state.running || state.paused) return;
 
-  state.leftAcc += dy;
+  state.leftAcc  += dy;
   state.rightAcc += dx;
 
-  while (Math.abs(state.leftAcc) >= MOUSE_MOVE_THRESHOLD) {
-    const step = state.leftAcc > 0 ? MOUSE_MOVE_THRESHOLD : -MOUSE_MOVE_THRESHOLD;
-    state.leftPress = Math.min(1, Math.max(0, state.leftPress + step * 0.012));
-    state.leftAcc -= step;
+  // 노브 threshold 도달 → 플리퍼 풀 스냅 (decay가 스프링 복귀 담당)
+  if (Math.abs(state.leftAcc) >= MOUSE_MOVE_THRESHOLD) {
+    state.leftPress = 1.0;
+    state.leftAcc = 0;
   }
 
-  while (Math.abs(state.rightAcc) >= MOUSE_MOVE_THRESHOLD) {
-    const step = state.rightAcc > 0 ? MOUSE_MOVE_THRESHOLD : -MOUSE_MOVE_THRESHOLD;
-    state.rightPress = Math.min(1, Math.max(0, state.rightPress + step * 0.012));
-    state.rightAcc -= step;
+  if (Math.abs(state.rightAcc) >= MOUSE_MOVE_THRESHOLD) {
+    state.rightPress = 1.0;
+    state.rightAcc = 0;
   }
 }
 
@@ -447,7 +405,6 @@ function updatePhysics(dt) {
   for (let i = 0; i < steps; i += 1) {
     const sub = scale / steps;
     state.ball.vy += c.gravity * sub;
-    applyDrainFunnel(sub);
     state.ball.x += state.ball.vx * sub;
     state.ball.y += state.ball.vy * sub;
 
@@ -479,6 +436,14 @@ function drawTable() {
   ctx.fillStyle = tableGrad;
   ctx.fillRect(24, 24, W - 48, H - 48);
 
+  // Center drain gap — red glow at bottom
+  const drainGrd = ctx.createLinearGradient(DRAIN_X1, H - 120, DRAIN_X2, H - 120);
+  drainGrd.addColorStop(0, "transparent");
+  drainGrd.addColorStop(0.5, "rgba(239,68,68,0.22)");
+  drainGrd.addColorStop(1, "transparent");
+  ctx.fillStyle = drainGrd;
+  ctx.fillRect(DRAIN_X1, H - 120, DRAIN_X2 - DRAIN_X1, 120);
+
   ctx.strokeStyle = "rgba(129, 140, 248, 0.35)";
   ctx.lineWidth = 3;
   for (const wall of WALLS) {
@@ -488,16 +453,14 @@ function drawTable() {
     ctx.stroke();
   }
 
-  ctx.fillStyle = "#020617";
-  ctx.beginPath();
-  ctx.moveTo(DRAIN_X1 - 24, DRAIN_FUNNEL_Y);
-  ctx.lineTo(DRAIN_X2 + 24, DRAIN_FUNNEL_Y);
-  ctx.lineTo(DRAIN_X2, H);
-  ctx.lineTo(DRAIN_X1, H);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle = "rgba(239, 68, 68, 0.45)";
+  // Drain edge markers
+  ctx.strokeStyle = "rgba(239,68,68,0.55)";
   ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(DRAIN_X1, H - 80);
+  ctx.lineTo(DRAIN_X1, H);
+  ctx.moveTo(DRAIN_X2, H - 80);
+  ctx.lineTo(DRAIN_X2, H);
   ctx.stroke();
 
   for (const target of TARGETS) {
@@ -525,12 +488,18 @@ function drawTable() {
   drawFlipper(RIGHT_FLIPPER, state.rightAngle, "#fb7185");
 
   if (!state.ball.active) {
-    const pull = state.plungerPull;
-    ctx.fillStyle = "#64748b";
-    ctx.fillRect(PLUNGER_X - 8, PLUNGER_Y + pull * 40, 16, 24 - pull * 40);
-    ctx.fillStyle = "rgba(255,255,255,0.4)";
+    // Ghost ball + drop indicator at launch point
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
     ctx.beginPath();
-    ctx.arc(PLUNGER_X - 20, PLUNGER_Y - 20, BALL_R, 0, Math.PI * 2);
+    ctx.moveTo(LAUNCH_X, LAUNCH_Y + BALL_R + 4);
+    ctx.lineTo(LAUNCH_X, LAUNCH_Y + 60);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(255,255,255,0.25)";
+    ctx.beginPath();
+    ctx.arc(LAUNCH_X, LAUNCH_Y, BALL_R, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.fillStyle = "#f8fafc";
@@ -667,7 +636,7 @@ window.addEventListener("mousemove", (event) => {
 window.addEventListener("mousedown", (event) => {
   if (!state.running) return;
   if (event.button === 0) {
-    launchPlunger();
+    launchBall();
     return;
   }
   if (event.button === 2) {

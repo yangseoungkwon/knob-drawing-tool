@@ -15,19 +15,21 @@ const stage            = document.querySelector(".nebula-stage");
 // ── Size vars (mutable on resize) ────────────────────────────────
 let W, H, CX, CY, RX, RY;
 
-function updateSizeVars() {
-  W  = canvas.width;
-  H  = canvas.height;
-  CX = W / 2;
-  CY = H / 2;
-  RX = W * 0.44;
-  RY = H * 0.44;
-}
+// 오프스크린 캔버스 — 곡선을 한 번만 그리고 N번 복사
+let offscreen, offCtx;
 
 function resizeCanvas() {
   canvas.width  = stage.clientWidth;
   canvas.height = stage.clientHeight;
-  updateSizeVars();
+  W  = canvas.width;  H  = canvas.height;
+  CX = W / 2;         CY = H / 2;
+  RX = W * 0.44;      RY = H * 0.44;
+
+  offscreen = document.createElement("canvas");
+  offscreen.width  = W;
+  offscreen.height = H;
+  offCtx = offscreen.getContext("2d");
+
   clearCanvas();
 }
 
@@ -76,9 +78,31 @@ function lissajousPoints(fx, ampY, phX, n = 1100) {
   return pts;
 }
 
-// ── Kaleidoscope (N-fold rotation + alternating mirror) ───────────
-function drawKaleido(pts, color, alpha, blur, width) {
-  const N    = state.kaleidoN;
+function strokePath(target, pts, color, alpha, width, blur) {
+  target.save();
+  target.globalAlpha = alpha;
+  target.strokeStyle = color;
+  target.lineWidth   = width;
+  target.lineJoin    = "round";
+  target.shadowColor = color;
+  target.shadowBlur  = blur;
+  target.beginPath();
+  target.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) target.lineTo(pts[i][0], pts[i][1]);
+  target.stroke();
+  target.restore();
+}
+
+// ── Kaleidoscope: 오프스크린에 1번 그리고 N번 drawImage 복사 ────────
+function drawKaleido(pts, color) {
+  // 1. 오프스크린에 3-pass 곡선 (shadowBlur 여기서만)
+  offCtx.clearRect(0, 0, W, H);
+  strokePath(offCtx, pts, color, 0.030, 16, 55);
+  strokePath(offCtx, pts, color, 0.130, 4,  20);
+  strokePath(offCtx, pts, color, 0.800, 1.3, 5);
+
+  // 2. N번 회전+반사 후 main canvas에 blit (shadowBlur 없이 빠름)
+  const N = state.kaleidoN;
   const step = (Math.PI * 2) / N;
   for (let i = 0; i < N; i++) {
     ctx.save();
@@ -86,33 +110,21 @@ function drawKaleido(pts, color, alpha, blur, width) {
     ctx.rotate(step * i);
     if (i % 2 === 1) ctx.scale(1, -1);
     ctx.translate(-CX, -CY);
-    drawCurve(pts, color, alpha, blur, width);
+    ctx.drawImage(offscreen, 0, 0);
     ctx.restore();
   }
 }
 
-function drawCurve(pts, color, alpha, blur, width) {
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.lineJoin = "round";
-  ctx.shadowColor = color;
-  ctx.shadowBlur = blur;
-  ctx.beginPath();
-  ctx.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
-  ctx.stroke();
-  ctx.restore();
+function drawSingle(pts, color) {
+  strokePath(ctx, pts, color, 0.030, 16, 55);
+  strokePath(ctx, pts, color, 0.130, 4,  20);
+  strokePath(ctx, pts, color, 0.800, 1.3, 5);
 }
 
 // ── Color ─────────────────────────────────────────────────────────
 function getColor() {
   if (state.colorMode === "fixed") return "hsl(270, 100%, 70%)";
-  if (state.colorMode === "ratio") {
-    const h = (state.freqX * 137.5) % 360;
-    return `hsl(${h}, 100%, 65%)`;
-  }
+  if (state.colorMode === "ratio") return `hsl(${(state.freqX * 137.5) % 360}, 100%, 65%)`;
   return `hsl(${state.hue}, 100%, 65%)`;
 }
 
@@ -121,20 +133,14 @@ function clearCanvas() {
   if (!W) return;
   ctx.fillStyle = "#000010";
   ctx.fillRect(0, 0, W, H);
-  drawStars();
-}
-
-function drawStars() {
-  const count = Math.round((W * H) / 1400);
   const rng = mulberry32(0xdeadbeef);
+  const count = Math.round((W * H) / 1400);
   for (let i = 0; i < count; i++) {
-    const x = rng() * W;
-    const y = rng() * H;
-    const r = rng() * 1.1 + 0.2;
-    const a = rng() * 0.5 + 0.05;
+    const x = rng() * W, y = rng() * H;
+    const r = rng() * 1.1 + 0.2, a = rng() * 0.5 + 0.05;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${180 + rng() * 60 | 0}, ${190 + rng() * 50 | 0}, 255, ${a})`;
+    ctx.fillStyle = `rgba(${180 + rng() * 60 | 0},${190 + rng() * 50 | 0},255,${a})`;
     ctx.fill();
   }
 }
@@ -150,6 +156,7 @@ function mulberry32(seed) {
 
 // ── Frame loop ────────────────────────────────────────────────────
 function frame() {
+  if (!W) { requestAnimationFrame(frame); return; }   // wait for ResizeObserver
   state.phase += state.phaseSpeed;
   if (state.colorMode === "auto") state.hue = (state.hue + 0.35) % 360;
 
@@ -158,10 +165,8 @@ function frame() {
 
   const pts   = lissajousPoints(state.freqX, state.ampY, state.phase);
   const color = getColor();
-  const draw  = state.kaleido ? drawKaleido : drawCurve;
-  draw(pts, color, 0.030, 55, 16);
-  draw(pts, color, 0.130, 20, 4);
-  draw(pts, color, 0.800,  5, 1.3);
+  if (state.kaleido) drawKaleido(pts, color);
+  else               drawSingle(pts, color);
 
   nebulaFxValEl.textContent    = state.freqX.toFixed(2);
   nebulaFyValEl.textContent    = Math.round(state.ampY * 100) + "%";
@@ -176,15 +181,32 @@ window.addEventListener("mousemove", (e) => {
   let nx = clamp(state.freqX - e.movementY * state.freqSens, 0.5, 9.5);
   if (state.snapInt) nx = Math.round(nx);
   state.freqX = nx;
-  state.ampY = clamp(state.ampY + e.movementX * state.ampSens, 0.08, 1.0);
+  state.ampY  = clamp(state.ampY + e.movementX * state.ampSens, 0.08, 1.0);
 });
 
-window.addEventListener("mousedown", (e) => {
-  if (e.button === 1) { e.preventDefault(); releaseLock(); }
+// 캔버스 좌클릭 → 잠금 진입
+canvas.addEventListener("click", (e) => {
+  if (e.button === 0 && !isLocked()) requestLock();
+});
+
+// 중클릭: 잠금 해제 — canvas + document, mousedown + auxclick 네 겹으로 잡기
+function onMiddleDown(e) {
+  if (e.button !== 1) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (isLocked()) releaseLock(); else requestLock();
+}
+canvas.addEventListener("mousedown",  onMiddleDown, { capture: true });
+canvas.addEventListener("auxclick",   onMiddleDown, { capture: true });
+document.addEventListener("mousedown",  onMiddleDown, { capture: true });
+document.addEventListener("auxclick",   onMiddleDown, { capture: true });
+
+// 우클릭: 지우기
+document.addEventListener("mousedown", (e) => {
   if (e.button === 2) { e.preventDefault(); clearCanvas(); }
-});
+}, true);
 
-window.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") releaseLock();
 });
 

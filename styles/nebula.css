@@ -1,3 +1,20 @@
+/* Full-viewport overrides — nebula needs the stage to fill remaining height */
+.maze-body {
+  padding: 0;
+  height: 100vh;
+  align-items: stretch;
+}
+
+.maze-app {
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+}
+
+.maze-workspace {
+  min-height: 0;
+}
+
 .nebula-stage {
   flex: 1;
   position: relative;
