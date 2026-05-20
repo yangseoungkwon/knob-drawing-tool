@@ -1,0 +1,50 @@
+.pong-canvas-wrap {
+  background: #0a0a0a;
+  padding: 20px;
+}
+
+#pongCanvas {
+  display: block;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 2px #1a1a1a,
+    0 0 24px rgba(255, 255, 255, 0.06),
+    inset 0 0 80px rgba(0, 0, 0, 0.5);
+  image-rendering: pixelated;
+}
+
+.pong-score-board {
+  color: #f8fafc;
+  min-width: 120px;
+  letter-spacing: 4px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.pong-goal-board {
+  color: #94a3b8;
+  min-width: 56px;
+  font-size: 1.1rem;
+  text-shadow: none;
+}
+
+.pong-dialog .pong-dialog-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.pong-dialog-label {
+  margin: 8px 0 6px !important;
+  text-align: left;
+}
+
+.pong-mode-options {
+  margin-bottom: 4px;
+}
+
+.mode-btn.active {
+  background: #4f46e5;
+  color: #fff;
+  border-color: #6366f1;
+}

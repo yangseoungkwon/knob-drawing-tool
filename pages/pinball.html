@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dual Knob Pinball</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/pinball.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Knob Pinball</span>
+        </div>
+        <div class="maze-timers">
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">점수</span>
+            <div id="pinballScoreBoard" class="maze-timer-board pinball-score-board">0</div>
+          </div>
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">목표 / 라이프</span>
+            <div id="pinballGoalBoard" class="maze-timer-board pinball-goal-board">5000 · ♥♥♥</div>
+          </div>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="pinballStartBtn" class="size-btn" type="button">시작</button>
+          <button id="pinballResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브</strong> 왼쪽 플리퍼</p>
+            <p class="maze-guide-line"><strong>우 노브</strong> 오른쪽 플리퍼</p>
+            <p class="maze-guide-line"><strong>좌 클릭</strong> 플런저(공 발사)</p>
+            <p class="maze-guide-line"><strong>우 클릭</strong> 테이블 넛지</p>
+            <p class="maze-guide-line"><strong>중클릭</strong> 일시정지</p>
+            <p class="maze-guide-line">못 치면 공이 <strong>가운데</strong>로 굴러 빠짐</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">상태</p>
+            <div class="maze-status-list">
+              <span id="pinballDifficultyState" class="status">Difficulty: -</span>
+              <span id="pinballLivesState" class="status">Lives: 3</span>
+              <span id="pinballBestState" class="status">Best: -</span>
+            </div>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">감도</p>
+            <div class="maze-sens-row">
+              <button id="pinballSensDecBtn" class="size-btn" type="button">−</button>
+              <span id="pinballSensState" class="status">2px/틱</span>
+              <button id="pinballSensIncBtn" class="size-btn" type="button">+</button>
+            </div>
+          </div>
+          <p id="pinballMessage" class="maze-message">난이도를 선택하고 시작하세요.</p>
+        </aside>
+
+        <div class="maze-canvas-wrap pinball-canvas-wrap">
+          <canvas id="pinballCanvas" width="640" height="720"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <div id="pinballStartOverlay" class="overlay">
+      <div class="dialog">
+        <h2>Knob Pinball</h2>
+        <p>듀얼 노브로 양쪽 플리퍼를 조작하는 핀볼입니다.<br />가운데 넓은 드레인에 빠지면 라이프 -1 · 좌 클릭으로 재발사</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="pinballStartControlBtn" class="maze-big-start-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="pinballResultOverlay" class="overlay hidden">
+      <div class="dialog">
+        <h2 id="pinballResultTitle">RESULT</h2>
+        <p id="pinballResultText">결과를 확인하세요.</p>
+        <button id="pinballReplayBtn" class="size-btn" type="button">다시 도전</button>
+      </div>
+    </div>
+
+    <script src="../scripts/pinball.js"></script>
+  </body>
+</html>

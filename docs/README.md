@@ -16,7 +16,9 @@
 - `pages/knob-drawing.html`: 노브 드로잉 서브페이지
 - `pages/maze.html`: 노브 매핑형 미로 탈출게임 서브페이지
 - `pages/safe-crack.html`: 듀얼 다이얼 금고 따기 퍼즐 서브페이지
-- `pages/rhythm-knob.html`: 듀얼 노브 리듬 게임 서브페이지
+- `pages/pong.html`: 클래식 퐁(1P vs CPU / 2P) 서브페이지
+- `pages/dodge.html`: 듀얼 노브 회피(생존) 게임 서브페이지
+- `pages/pinball.html`: 듀얼 노브 핀볼 게임 서브페이지
 
 ## 실행 방법
 
@@ -32,7 +34,9 @@ python3 -m http.server 8080
 - 노브 드로잉: `http://localhost:8080/pages/knob-drawing.html`
 - 미로 게임: `http://localhost:8080/pages/maze.html`
 - 금고 따기: `http://localhost:8080/pages/safe-crack.html`
-- 리듬 노브: `http://localhost:8080/pages/rhythm-knob.html`
+- 노브 퐁: `http://localhost:8080/pages/pong.html`
+- 노브 회피: `http://localhost:8080/pages/dodge.html`
+- 노브 핀볼: `http://localhost:8080/pages/pinball.html`
 
 ## RP2040 펌웨어 시작점
 

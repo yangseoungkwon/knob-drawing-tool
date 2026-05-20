@@ -32,7 +32,9 @@ const RANKING_STORAGE_KEY = "dual-knob-pong-wins-v2";
 const W = canvas.width;
 const H = canvas.height;
 const BALL_R = 8;
-const PADDLE_MARGIN = 24;
+const PADDLE_MARGIN = 12;
+const PADDLE_Y_MARGIN = 2;
+const INPUT_WARMUP_MS = 450;
 const MAX_BOUNCE_ANGLE = (75 * Math.PI) / 180;
 
 const PADDLE_COLOR = {
@@ -92,7 +94,12 @@ const state = {
   rafId: 0,
   lastFrameMs: 0,
   pointer: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
-  mouse: { active: false, lastX: 0, lastY: 0 }
+  mouse: { active: false, lastX: 0, lastY: 0 },
+  inputWarmupUntil: 0,
+  blockLaunchUntil: 0,
+  autoServeAt: 0,
+  aiSmoothY: H / 2,
+  aiErrorOffset: 0
 };
 
 let MOUSE_MOVE_THRESHOLD = 2;
@@ -113,7 +120,14 @@ function paddleX(side) {
 
 function clampPaddleY(y) {
   const half = cfg().paddleH / 2;
-  return Math.min(H - half - 4, Math.max(half + 4, y));
+  return Math.min(H - half - PADDLE_Y_MARGIN, Math.max(half + PADDLE_Y_MARGIN, y));
+}
+
+function syncInputBaseline() {
+  state.leftAccY = 0;
+  state.rightAccY = 0;
+  state.mouse.active = false;
+  state.inputWarmupUntil = performance.now() + INPUT_WARMUP_MS;
 }
 
 function ensureAudio() {
@@ -195,25 +209,43 @@ function resetMatch() {
   state.scoreRight = 0;
   state.leftPaddle.y = H / 2;
   state.rightPaddle.y = H / 2;
-  resetBall("left");
+  state.aiSmoothY = H / 2;
+  state.aiErrorOffset = 0;
+  state.autoServeAt = 0;
+  syncInputBaseline();
+  resetBallForMode("left", false);
   const serveHint = isCpuMode()
     ? "좌 클릭으로 서브 · 왼쪽(당신) vs CPU"
     : "서브: 좌 클릭=왼쪽 · 우 클릭=오른쪽";
   pongMessageEl.textContent = serveHint;
 }
 
-function resetBall(side) {
-  state.ball.x = side === "left" ? W * 0.35 : W * 0.65;
+function resetBallForMode(loser, autoServeCpu) {
+  state.ball.x = loser === "left" ? W * 0.35 : W * 0.65;
   state.ball.y = H / 2;
   state.ball.vx = 0;
   state.ball.vy = 0;
   state.ball.speed = 0;
   state.waitingServe = true;
-  state.serveSide = side;
+  state.autoServeAt = 0;
+
+  if (isCpuMode()) {
+    state.serveSide = "left";
+    if (autoServeCpu) {
+      state.autoServeAt = performance.now() + 550;
+      pongMessageEl.textContent = "득점! 잠시 후 공이 나갑니다…";
+    } else {
+      pongMessageEl.textContent = "좌 클릭으로 서브하세요.";
+    }
+  } else {
+    state.serveSide = loser;
+    pongMessageEl.textContent = `${loser === "left" ? "왼쪽" : "오른쪽"} 서브 — 해당 클릭`;
+  }
 }
 
 function launchBall(fromSide) {
   if (!state.waitingServe || !state.running || state.paused) return;
+  if (performance.now() < state.blockLaunchUntil) return;
   if (fromSide && state.serveSide !== fromSide) return;
 
   const c = cfg();
@@ -245,6 +277,7 @@ function bounceOffPaddle(paddleY, movingRight) {
 
 function consumeMouseMoveDelta(dx, dy) {
   if (!state.running || state.paused) return;
+  if (performance.now() < state.inputWarmupUntil) return;
 
   state.leftAccY += dy;
   if (!isCpuMode()) state.rightAccY += dx;
@@ -264,10 +297,22 @@ function consumeMouseMoveDelta(dx, dy) {
 
 function updateAi() {
   if (!isCpuMode()) return;
+  if (!Number.isFinite(state.aiSmoothY)) state.aiSmoothY = H / 2;
   const c = cfg();
-  const error = (Math.random() - 0.5) * c.aiError;
-  const targetY = state.ball.y + error;
-  const diff = targetY - state.rightPaddle.y;
+
+  if (state.waitingServe) {
+    const center = H / 2;
+    state.aiSmoothY += (center - state.aiSmoothY) * 0.14;
+    state.rightPaddle.y += (state.aiSmoothY - state.rightPaddle.y) * 0.2;
+    return;
+  }
+
+  if (Math.random() < 0.025) {
+    state.aiErrorOffset = (Math.random() - 0.5) * c.aiError;
+  }
+  const targetY = state.ball.y + state.aiErrorOffset;
+  state.aiSmoothY += (targetY - state.aiSmoothY) * 0.16;
+  const diff = state.aiSmoothY - state.rightPaddle.y;
   const step = Math.sign(diff) * Math.min(Math.abs(diff), c.aiSpeed);
   state.rightPaddle.y = clampPaddleY(state.rightPaddle.y + step);
 }
@@ -353,8 +398,16 @@ function scorePoint(winner) {
   }
 
   const loser = winner === "left" ? "right" : "left";
-  resetBall(loser);
-  pongMessageEl.textContent = `${winner === "left" ? "왼쪽" : "오른쪽"} 득점! 서브하세요.`;
+  if (isCpuMode()) {
+    state.aiSmoothY = H / 2;
+    state.aiErrorOffset = 0;
+    state.rightPaddle.y = H / 2;
+    syncInputBaseline();
+    resetBallForMode(loser, loser === "right");
+  } else {
+    resetBallForMode(loser, false);
+    pongMessageEl.textContent = `${winner === "left" ? "왼쪽" : "오른쪽"} 득점! 서브하세요.`;
+  }
   updateStatus();
 }
 
@@ -478,14 +531,19 @@ function draw() {
 
   // ── Serve hint ───────────────────────────────────────────
   if (state.waitingServe && state.running) {
-    const who = state.serveSide === "left" ? "LEFT" : "RIGHT";
-    const col = state.serveSide === "left" ? PADDLE_COLOR.left.mid : PADDLE_COLOR.right.mid;
+    const who = isCpuMode() ? "LEFT" : state.serveSide === "left" ? "LEFT" : "RIGHT";
+    const col = who === "LEFT" ? PADDLE_COLOR.left.mid : PADDLE_COLOR.right.mid;
+    const hint = isCpuMode()
+      ? state.autoServeAt
+        ? "SERVE…"
+        : "좌 클릭 서브"
+      : `SERVE · ${who}  클릭`;
     ctx.save();
     ctx.textAlign = "center";
     ctx.font = "600 13px Inter, sans-serif";
     ctx.fillStyle = col;
     ctx.globalAlpha = 0.85;
-    ctx.fillText(`SERVE · ${who}  클릭`, W / 2, H / 2 + 32);
+    ctx.fillText(hint, W / 2, H / 2 + 32);
     ctx.restore();
   }
 
@@ -590,6 +648,11 @@ function frame(ts) {
   const dt = Math.min(48, ts - state.lastFrameMs);
   state.lastFrameMs = ts;
 
+  if (isCpuMode() && state.autoServeAt && performance.now() >= state.autoServeAt) {
+    state.autoServeAt = 0;
+    launchBall("left");
+  }
+
   updateAi();
   updateBall(dt);
   // Ball trail
@@ -609,6 +672,8 @@ function startGame() {
   state.running = true;
   state.paused = false;
   state.lastFrameMs = 0;
+  state.blockLaunchUntil = performance.now() + 400;
+  syncInputBaseline();
   pongStartOverlay.classList.add("hidden");
   pongResultOverlay.classList.add("hidden");
   updateStatus();
@@ -646,7 +711,7 @@ function updateSensStatus() {
 window.addEventListener("mousemove", (event) => {
   state.pointer.x = event.clientX;
   state.pointer.y = event.clientY;
-  if (!state.running || state.paused) {
+  if (!state.running || state.paused || performance.now() < state.inputWarmupUntil) {
     state.mouse.lastX = event.clientX;
     state.mouse.lastY = event.clientY;
     state.mouse.active = true;
@@ -673,7 +738,7 @@ window.addEventListener("mousedown", (event) => {
   }
   if (event.button === 2) {
     event.preventDefault();
-    launchBall("right");
+    if (!isCpuMode()) launchBall("right");
     return;
   }
   if (event.button === 1 || event.buttons === 3) {

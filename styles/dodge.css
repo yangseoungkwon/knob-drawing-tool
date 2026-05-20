@@ -1,0 +1,21 @@
+.dodge-canvas-wrap {
+  background-color: #050a14;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12), transparent 55%),
+    radial-gradient(circle, #1e293b 1px, transparent 1px);
+  background-size: auto, 20px 20px;
+}
+
+#dodgeCanvas {
+  display: block;
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px rgba(129, 140, 248, 0.15),
+    0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+.dodge-score-board {
+  color: #a5b4fc;
+  text-shadow: 0 0 10px rgba(165, 180, 252, 0.45);
+  min-width: 100px;
+}

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dual Knob Pong</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/pong.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Knob Pong</span>
+        </div>
+        <div class="maze-timers">
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">점수</span>
+            <div id="pongScoreBoard" class="maze-timer-board pong-score-board">0 : 0</div>
+          </div>
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">목표</span>
+            <div id="pongGoalBoard" class="maze-timer-board pong-goal-board">7</div>
+          </div>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="pongStartBtn" class="size-btn" type="button">시작</button>
+          <button id="pongResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브</strong> 왼쪽 패들</p>
+            <p class="maze-guide-line"><strong>우 노브</strong> 오른쪽 패들</p>
+            <p class="maze-guide-line"><strong>좌/우 클릭</strong> 각자 서브</p>
+            <p class="maze-guide-line"><strong>중클릭</strong> 일시정지</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">상태</p>
+            <div class="maze-status-list">
+              <span id="pongDifficultyState" class="status">Difficulty: -</span>
+              <span id="pongModeState" class="status">Mode: -</span>
+              <span id="pongBallSpeedState" class="status">Ball: -</span>
+              <span id="pongBestState" class="status">Best: -</span>
+            </div>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">감도</p>
+            <div class="maze-sens-row">
+              <button id="pongSensDecBtn" class="size-btn" type="button">−</button>
+              <span id="pongSensState" class="status">2px/틱</span>
+              <button id="pongSensIncBtn" class="size-btn" type="button">+</button>
+            </div>
+          </div>
+          <p id="pongMessage" class="maze-message">모드와 난이도를 선택하세요.</p>
+        </aside>
+
+        <div class="maze-canvas-wrap pong-canvas-wrap">
+          <canvas id="pongCanvas" width="640" height="400"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <div id="pongStartOverlay" class="overlay">
+      <div class="dialog pong-dialog">
+        <h2>Knob Pong</h2>
+        <p class="pong-dialog-desc">
+          1972년 아타리 퐁 스타일 · HTML5 Canvas<br />
+          듀얼 노브(마우스)로 패들을 움직입니다.
+        </p>
+        <p class="maze-panel-label pong-dialog-label">게임 모드</p>
+        <div class="size-options pong-mode-options">
+          <button class="size-btn mode-btn active" data-mode="cpu" type="button">1P vs CPU</button>
+          <button class="size-btn mode-btn" data-mode="2p" type="button">2P 로컬</button>
+        </div>
+        <p class="maze-panel-label pong-dialog-label">난이도</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="pongStartControlBtn" class="maze-big-start-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="pongResultOverlay" class="overlay hidden">
+      <div class="dialog">
+        <h2 id="pongResultTitle">WINNER</h2>
+        <p id="pongResultText">결과를 확인하세요.</p>
+        <button id="pongReplayBtn" class="size-btn" type="button">다시 도전</button>
+      </div>
+    </div>
+
+    <script src="../scripts/pong.js"></script>
+  </body>
+</html>

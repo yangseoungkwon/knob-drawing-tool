@@ -1,0 +1,28 @@
+.pinball-canvas-wrap {
+  background: radial-gradient(ellipse at 50% 30%, #1a1030 0%, #080810 70%);
+  padding: 12px;
+}
+
+#pinballCanvas {
+  display: block;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 2px #312e81,
+    0 0 40px rgba(129, 140, 248, 0.15),
+    inset 0 0 60px rgba(0, 0, 0, 0.6);
+}
+
+.pinball-score-board {
+  color: #fbbf24;
+  min-width: 90px;
+  font-family: "Courier New", Courier, monospace;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.pinball-goal-board {
+  color: #94a3b8;
+  min-width: 140px;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-shadow: none;
+}
