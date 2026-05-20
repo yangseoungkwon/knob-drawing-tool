@@ -53,17 +53,17 @@ const DIFFICULTY = {
   easy: {
     label: "초급", rounds: 5,
     revealMs: 3500, timeLimitSec: 40,
-    tolerance: 0.30, freqSens: 0.006,
+    tolerance: 0.30, freqSens: 0.003,
   },
   normal: {
     label: "중급", rounds: 5,
     revealMs: 2500, timeLimitSec: 30,
-    tolerance: 0.17, freqSens: 0.005,
+    tolerance: 0.17, freqSens: 0.0025,
   },
   hard: {
     label: "고급", rounds: 5,
     revealMs: 1800, timeLimitSec: 22,
-    tolerance: 0.09, freqSens: 0.004,
+    tolerance: 0.09, freqSens: 0.002,
   },
 };
 
@@ -71,7 +71,6 @@ const DIFFICULTY = {
 const state = {
   difficulty: "easy",
   running: false,
-  paused: false,
   freqX: 2.0,
   freqY: 2.0,
   targetFX: 2,
@@ -84,14 +83,30 @@ const state = {
   revealEndMs: 0,
   roundStartMs: 0,
   submitted: false,
-  pauseStartedMs: 0,
   rafId: 0,
-  mouse: { active: false, lastX: 0, lastY: 0 },
 };
 
 // ── Utils ─────────────────────────────────────────────────────────
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 function cfg() { return DIFFICULTY[state.difficulty]; }
+function isLocked() { return document.pointerLockElement === canvas; }
+
+// ── Pointer Lock ──────────────────────────────────────────────────
+function requestLock() {
+  if (!isLocked()) canvas.requestPointerLock();
+}
+function releaseLock() {
+  if (isLocked()) document.exitPointerLock();
+}
+function toggleLock() {
+  if (isLocked()) releaseLock();
+  else if (state.running && !state.revealActive && !state.submitted) requestLock();
+}
+
+document.addEventListener("pointerlockchange", () => {
+  // just refresh the guide text to reflect lock state change
+  updateStatus();
+});
 
 // ── Lissajous curve computation ───────────────────────────────────
 function lissajousPoints(fx, fy, n = 900) {
@@ -133,7 +148,6 @@ function calcAccuracy() {
 function drawGrid() {
   ctx.save();
 
-  // Minor grid
   ctx.strokeStyle = C.grid;
   ctx.lineWidth = 0.5;
   for (let i = 0; i <= 10; i++) {
@@ -142,13 +156,11 @@ function drawGrid() {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
   }
 
-  // Center crosshair
   ctx.strokeStyle = C.gridCenter;
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(CX, 0); ctx.lineTo(CX, H); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(0, CY); ctx.lineTo(W, CY); ctx.stroke();
 
-  // Scope boundary circle
   ctx.strokeStyle = "rgba(0,255,65,0.07)";
   ctx.beginPath();
   ctx.arc(CX, CY, SCOPE_R * 1.005, 0, Math.PI * 2);
@@ -162,23 +174,19 @@ function drawHUD(acc, revealing) {
   ctx.font = "11px 'Courier New', Courier, monospace";
   ctx.textBaseline = "top";
 
-  // Top-left: round info
   ctx.fillStyle = C.textDim;
   ctx.textAlign = "left";
   ctx.fillText(`RND ${state.round + 1} / ${cfg().rounds}`, 10, 10);
 
-  // Top-right: total score
   ctx.textAlign = "right";
   ctx.fillText(`SCORE  ${state.totalScore}`, W - 10, 10);
 
-  // Bottom-left/right: freq readouts
   ctx.fillStyle = C.textBright;
   ctx.textAlign = "left";
   ctx.fillText(`fx  ${state.freqX.toFixed(2)}`, 10, H - 22);
   ctx.textAlign = "right";
   ctx.fillText(`fy  ${state.freqY.toFixed(2)}`, W - 10, H - 22);
 
-  // Match accuracy bar
   if (!revealing && !state.submitted) {
     const barW = 160, barH = 5;
     const barX = CX - barW / 2, barY = H - 16;
@@ -193,7 +201,6 @@ function drawHUD(acc, revealing) {
     ctx.fillText(`MATCH  ${Math.round(acc * 100)}%`, CX, barY - 2);
   }
 
-  // Reveal banner
   if (revealing) {
     ctx.save();
     ctx.textAlign = "center";
@@ -210,7 +217,6 @@ function drawHUD(acc, revealing) {
 }
 
 function draw() {
-  // Background
   ctx.fillStyle = C.bg;
   ctx.fillRect(0, 0, W, H);
 
@@ -218,7 +224,6 @@ function draw() {
 
   const revealing = state.revealActive;
 
-  // Target curve (cyan ghost)
   const tPts = lissajousPoints(state.targetFX, state.targetFY);
   if (revealing) {
     drawCurve(tPts, C.target, 0.18, 32, 5);
@@ -227,13 +232,11 @@ function draw() {
     drawCurve(tPts, C.target, 0.14, 6, 1.5);
   }
 
-  // Player curve — phosphor glow (3-pass)
   const pPts = lissajousPoints(state.freqX, state.freqY);
   drawCurve(pPts, C.phosphor, 0.05, 40, 12);
   drawCurve(pPts, C.phosphor, 0.16, 18, 4);
   drawCurve(pPts, C.phosphor, 0.82, 4,  1.5);
 
-  // Vignette
   const vig = ctx.createRadialGradient(CX, CY, SCOPE_R * 0.45, CX, CY, SCOPE_R * 1.7);
   vig.addColorStop(0, "rgba(0,0,0,0)");
   vig.addColorStop(1, "rgba(0,5,2,0.75)");
@@ -241,21 +244,6 @@ function draw() {
   ctx.fillRect(0, 0, W, H);
 
   if (state.running) drawHUD(calcAccuracy(), revealing);
-
-  // Pause overlay
-  if (state.paused) {
-    ctx.fillStyle = "rgba(0,0,0,0.78)";
-    ctx.fillRect(0, 0, W, H);
-    ctx.save();
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = "bold 22px 'Courier New', Courier, monospace";
-    ctx.fillStyle = C.phosphor;
-    ctx.shadowColor = C.phosphor;
-    ctx.shadowBlur = 20;
-    ctx.fillText("PAUSED", CX, CY);
-    ctx.restore();
-  }
 }
 
 // ── Game flow ─────────────────────────────────────────────────────
@@ -274,7 +262,6 @@ function startGame() {
   state.totalScore  = 0;
   state.roundScores = [];
   state.running     = true;
-  state.paused      = false;
   scopeResultOverlay.classList.add("hidden");
   scopeStartOverlay.classList.add("hidden");
   startRound();
@@ -287,7 +274,6 @@ function startRound() {
   state.targetFX = tx;
   state.targetFY = ty;
 
-  // Place player frequencies at least 1.5 away from target
   let px, py;
   do {
     px = parseFloat((Math.random() * 5 + 1).toFixed(1));
@@ -300,18 +286,18 @@ function startRound() {
   state.revealEndMs  = performance.now() + cfg().revealMs;
   state.roundStartMs = state.revealEndMs;
   state.submitted    = false;
-  state.mouse.active = false;
   scopeMessageEl.textContent = `패턴을 기억하세요! (${cfg().revealMs / 1000}초)`;
   updateStatus();
 }
 
 function submitRound() {
-  if (!state.running || state.paused || state.revealActive || state.submitted) return;
+  if (!state.running || state.revealActive || state.submitted) return;
   state.submitted = true;
+  releaseLock();
 
-  const acc       = calcAccuracy();
-  const elapsed   = (performance.now() - state.roundStartMs) / 1000;
-  const timeRatio = clamp(1 - elapsed / cfg().timeLimitSec, 0, 1);
+  const acc        = calcAccuracy();
+  const elapsed    = (performance.now() - state.roundStartMs) / 1000;
+  const timeRatio  = clamp(1 - elapsed / cfg().timeLimitSec, 0, 1);
   const roundScore = Math.round(acc * 750 + timeRatio * 250);
   state.totalScore += roundScore;
   state.roundScores.push({ acc, roundScore });
@@ -329,6 +315,7 @@ function submitRound() {
 
 function finishGame() {
   state.running = false;
+  releaseLock();
   cancelAnimationFrame(state.rafId);
   draw();
 
@@ -342,27 +329,9 @@ function finishGame() {
   updateStatus();
 }
 
-function togglePause() {
-  if (!state.running) return;
-  if (!state.paused) {
-    state.paused = true;
-    state.pauseStartedMs = performance.now();
-    cancelAnimationFrame(state.rafId);
-    draw();
-    scopeMessageEl.textContent = "일시정지";
-  } else {
-    const gap = performance.now() - state.pauseStartedMs;
-    state.revealEndMs  += gap;
-    state.roundStartMs += gap;
-    state.paused = false;
-    state.rafId = requestAnimationFrame(frame);
-    scopeMessageEl.textContent = "재개!";
-  }
-}
-
 function openStartOverlay() {
   state.running = false;
-  state.paused  = false;
+  releaseLock();
   cancelAnimationFrame(state.rafId);
   scopeResultOverlay.classList.add("hidden");
   scopeStartOverlay.classList.remove("hidden");
@@ -405,11 +374,6 @@ function updatePhaseGuide() {
       "난이도를 선택하고 시작 버튼을 누르세요.");
     return;
   }
-  if (state.paused) {
-    setPhase("idle", "⏸", "일시정지",
-      "중클릭으로 재개할 수 있습니다.");
-    return;
-  }
   if (state.revealActive) {
     setPhase("reveal", "◉", "① 파형 기억 중",
       "청색 파형의 모양을 눈에 담으세요.\n곧 희미해집니다. 특징적인 곡선 수와 대칭을 기억하세요.");
@@ -420,16 +384,20 @@ function updatePhaseGuide() {
       "다음 라운드 준비 중...");
     return;
   }
+  const locked = isLocked();
   const acc = calcAccuracy();
+  const lockHint = locked
+    ? "\n중클릭으로 커서 해제"
+    : "\n중클릭으로 커서 잠금 (노브 조작)";
   if (acc < 0.35) {
     setPhase("play", "◎", "② 주파수 조절 중",
-      "좌 노브(↕)를 돌려 X 주파수를,\n우 노브(↔)를 돌려 Y 주파수를 바꾸세요.\n초록 파형이 청색과 닮아지도록 조절하세요.");
+      `좌 노브(↕)를 돌려 X 주파수를,\n우 노브(↔)를 돌려 Y 주파수를 바꾸세요.\n초록 파형이 청색과 닮아지도록 조절하세요.${lockHint}`);
   } else if (acc < 0.70) {
     setPhase("play", "◎", "② 조금 더 가까이",
-      `MATCH ${Math.round(acc * 100)}% — 비슷해지고 있어요!\n더 세밀하게 조절해 보세요.\n패턴 모양이 거의 같아지면 클릭하세요.`);
+      `MATCH ${Math.round(acc * 100)}% — 비슷해지고 있어요!\n더 세밀하게 조절해 보세요.\n패턴 모양이 거의 같아지면 클릭하세요.${lockHint}`);
   } else {
     setPhase("good", "◉", "③ 클릭으로 제출!",
-      `MATCH ${Math.round(acc * 100)}% — 훌륭합니다!\n지금 클릭하면 높은 점수를 받습니다.\n더 정밀하게 맞추면 점수가 올라요.`);
+      `MATCH ${Math.round(acc * 100)}% — 훌륭합니다!\n지금 클릭하면 높은 점수를 받습니다.\n더 정밀하게 맞추면 점수가 올라요.${lockHint}`);
   }
 }
 
@@ -448,13 +416,13 @@ function updateStatus() {
 
 // ── Frame loop ────────────────────────────────────────────────────
 function frame() {
-  if (!state.running || state.paused) return;
+  if (!state.running) return;
 
   const now = performance.now();
   if (state.revealActive && now >= state.revealEndMs) {
     state.revealActive = false;
     state.roundStartMs = now;
-    state.mouse.active = false;
+    requestLock();
     scopeMessageEl.textContent = "패턴을 재현하고 클릭으로 제출!";
   }
 
@@ -465,32 +433,21 @@ function frame() {
 
 // ── Input ─────────────────────────────────────────────────────────
 window.addEventListener("mousemove", (e) => {
-  const blocked = !state.running || state.paused || state.revealActive || state.submitted;
-  if (blocked) {
-    state.mouse.lastX = e.clientX;
-    state.mouse.lastY = e.clientY;
-    state.mouse.active = true;
-    return;
-  }
-  if (!state.mouse.active) {
-    state.mouse.active = true;
-    state.mouse.lastX = e.clientX;
-    state.mouse.lastY = e.clientY;
-    return;
-  }
-  const dx = e.clientX - state.mouse.lastX;
-  const dy = e.clientY - state.mouse.lastY;
-  state.mouse.lastX = e.clientX;
-  state.mouse.lastY = e.clientY;
+  if (!state.running || state.revealActive || state.submitted) return;
+  if (!isLocked()) return;
 
   const s = cfg().freqSens;
-  state.freqX = clamp(state.freqX - dy * s, 0.5, 6.5);  // left knob (Y)
-  state.freqY = clamp(state.freqY + dx * s, 0.5, 6.5);  // right knob (X)
+  state.freqX = clamp(state.freqX - e.movementY * s, 0.5, 6.5);  // left knob (Y-axis)
+  state.freqY = clamp(state.freqY + e.movementX * s, 0.5, 6.5);  // right knob (X-axis)
 });
 
 window.addEventListener("mousedown", (e) => {
-  if (e.button === 1) { e.preventDefault(); togglePause(); return; }
-  if (!state.running || state.paused) return;
+  if (e.button === 1) {
+    e.preventDefault();
+    toggleLock();
+    return;
+  }
+  if (!state.running) return;
   if (e.button === 0 || e.button === 2) {
     e.preventDefault();
     submitRound();

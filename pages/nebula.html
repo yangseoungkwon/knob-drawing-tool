@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nebula Drawing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/nebula.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Nebula Drawing</span>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="nebulaClearBtn" class="size-btn" type="button">지우기</button>
+          <button id="nebulaLockBtn" class="size-btn" type="button">커서 잠금</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">주파수</p>
+            <div class="nebula-freq-display">
+              <div class="nebula-freq-row">
+                <span class="nebula-freq-label">밴드</span>
+                <span id="nebulaFxVal" class="nebula-freq-val">3.00</span>
+              </div>
+              <div class="nebula-freq-row">
+                <span class="nebula-freq-label">상하 폭</span>
+                <span id="nebulaFyVal" class="nebula-freq-val">80%</span>
+              </div>
+              <div class="nebula-freq-row nebula-freq-row-ratio">
+                <span class="nebula-freq-label">현재</span>
+                <span id="nebulaRatioVal" class="nebula-freq-val nebula-ratio-val">3밴드 · 80%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">거울 (칼레이도스코프)</p>
+            <div class="nebula-btn-group">
+              <button class="size-btn nebula-kaleido-btn" data-kaleido="off">없음</button>
+              <button class="size-btn nebula-kaleido-btn" data-kaleido="3">3겹</button>
+              <button class="size-btn nebula-kaleido-btn active" data-kaleido="6">6겹</button>
+              <button class="size-btn nebula-kaleido-btn" data-kaleido="12">12겹</button>
+            </div>
+          </div>
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">색상</p>
+            <div class="nebula-btn-group">
+              <button class="size-btn nebula-mode-btn active" data-mode="auto">자동</button>
+              <button class="size-btn nebula-mode-btn" data-mode="ratio">비율</button>
+              <button class="size-btn nebula-mode-btn" data-mode="fixed">보라</button>
+            </div>
+          </div>
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">위상 속도</p>
+            <div class="nebula-btn-group">
+              <button class="size-btn nebula-speed-btn" data-speed="0.001">느리게</button>
+              <button class="size-btn nebula-speed-btn active" data-speed="0.004">보통</button>
+              <button class="size-btn nebula-speed-btn" data-speed="0.014">빠르게</button>
+            </div>
+          </div>
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">정수 스냅</p>
+            <div class="nebula-btn-group">
+              <button class="size-btn nebula-snap-btn active" data-snap="off">자유</button>
+              <button class="size-btn nebula-snap-btn" data-snap="on">정수만</button>
+            </div>
+          </div>
+
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브 ↕</strong> 밴드 수</p>
+            <p class="maze-guide-line"><strong>우 노브 ↔</strong> 상하 폭</p>
+            <p class="maze-guide-line"><strong>우 클릭</strong> 캔버스 지우기</p>
+            <p class="maze-guide-line"><strong>중클릭</strong> 커서 잠금/해제</p>
+          </div>
+
+          <p id="nebulaMessage" class="maze-message">커서 잠금 후 노브를 돌려 성운을 그리세요.</p>
+        </aside>
+
+        <div class="nebula-stage">
+          <canvas id="nebulaCanvas" width="480" height="480"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <script src="../scripts/nebula.js"></script>
+  </body>
+</html>
