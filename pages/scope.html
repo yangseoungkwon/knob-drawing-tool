@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oscilloscope</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles/style.css" />
+    <link rel="stylesheet" href="../styles/maze.css" />
+    <link rel="stylesheet" href="../styles/scope.css" />
+  </head>
+  <body class="maze-body">
+    <div class="maze-app">
+
+      <header class="maze-toolbar">
+        <div class="maze-toolbar-left">
+          <a class="size-btn home-btn" href="./index.html">← 홈</a>
+          <span class="maze-app-title">Oscilloscope</span>
+        </div>
+        <div class="maze-timers">
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">점수</span>
+            <div id="scopeScoreBoard" class="maze-timer-board">0</div>
+          </div>
+          <div class="maze-timer-group">
+            <span class="maze-timer-label">라운드</span>
+            <div id="scopeRoundBoard" class="maze-timer-board">0 / 5</div>
+          </div>
+        </div>
+        <div class="maze-toolbar-right">
+          <button id="scopeStartBtn" class="size-btn" type="button">시작</button>
+          <button id="scopeResetBtn" class="size-btn" type="button">다시 시작</button>
+        </div>
+      </header>
+
+      <section class="maze-workspace">
+        <aside class="maze-panel">
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">조작법</p>
+            <p class="maze-guide-line"><strong>좌 노브</strong> X 주파수 조절</p>
+            <p class="maze-guide-line"><strong>우 노브</strong> Y 주파수 조절</p>
+            <p class="maze-guide-line"><strong>좌/우 클릭</strong> 제출</p>
+            <p class="maze-guide-line"><strong>중클릭</strong> 일시정지</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">방법</p>
+            <p class="maze-guide-line">목표 파형 <strong class="scope-hint-blue">청색</strong> 으로 표시</p>
+            <p class="maze-guide-line">내 파형 <strong class="scope-hint-green">초록</strong> 으로 표시</p>
+            <p class="maze-guide-line">기억 후 두 노브로 재현</p>
+          </div>
+          <div class="maze-panel-section">
+            <p class="maze-panel-label">상태</p>
+            <div class="maze-status-list">
+              <span id="scopeDifficultyState" class="status">Difficulty: -</span>
+              <span id="scopeRoundState" class="status">Round: 0 / 5</span>
+              <span id="scopeMatchState" class="status">Match: 0%</span>
+              <span id="scopeBestState" class="status">Best: -</span>
+            </div>
+          </div>
+          <p id="scopeMessage" class="maze-message">난이도를 선택하고 시작하세요.</p>
+        </aside>
+
+        <div class="scope-stage">
+          <canvas id="scopeCanvas" width="480" height="480"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <div id="scopeStartOverlay" class="overlay">
+      <div class="dialog scope-dialog">
+        <h2>Oscilloscope</h2>
+        <p>리사주(Lissajous) 파형 재현 게임.<br>
+          <span class="scope-hint-blue">청색</span> 목표 파형을 기억한 뒤,<br>
+          두 노브로 주파수를 맞춰 재현하세요.</p>
+        <div class="size-options">
+          <button class="size-btn difficulty-btn" data-difficulty="easy" type="button">초급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="normal" type="button">중급</button>
+          <button class="size-btn difficulty-btn" data-difficulty="hard" type="button">고급</button>
+        </div>
+        <button id="scopeStartControlBtn" class="maze-big-start-btn" type="button">시작</button>
+      </div>
+    </div>
+
+    <div id="scopeResultOverlay" class="overlay hidden">
+      <div class="dialog scope-dialog">
+        <h2 id="scopeResultTitle">COMPLETE</h2>
+        <p id="scopeResultText">결과를 확인하세요.</p>
+        <button id="scopeReplayBtn" class="size-btn" type="button">다시 도전</button>
+      </div>
+    </div>
+
+    <script src="../scripts/scope.js"></script>
+  </body>
+</html>
